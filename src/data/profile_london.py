@@ -44,8 +44,14 @@ def profile_dataset(catalog_raw: pd.DataFrame, annotated_raw: pd.DataFrame) -> d
     right["_name_key"] = _key(right[name_col])
     right["_address_key"] = _key(right[address_col])
 
-    exact_matches = left.merge(
-        right[["_name_key", "_address_key"]].drop_duplicates(),
+    valid_left = left["_name_key"].ne("") & left["_address_key"].ne("")
+    valid_right = right["_name_key"].ne("") & right["_address_key"].ne("")
+
+    left_valid = left.loc[valid_left].copy()
+    right_valid = right.loc[valid_right].copy()
+
+    exact_matches = left_valid.merge(
+        right_valid[["_name_key", "_address_key"]].drop_duplicates(),
         on=["_name_key", "_address_key"],
         how="inner",
     )
@@ -78,16 +84,23 @@ def profile_dataset(catalog_raw: pd.DataFrame, annotated_raw: pd.DataFrame) -> d
         "annotation_category_count": len(category_cols),
         "annotation_categories": category_cols,
         "positive_labels_by_category": positives,
+        "catalog_valid_identity_rows": int(valid_left.sum()),
+        "annotation_valid_identity_rows": int(valid_right.sum()),
+        "catalog_invalid_identity_rows": int((~valid_left).sum()),
+        "annotation_invalid_identity_rows": int((~valid_right).sum()),
         "catalog_duplicate_name_address": int(
-            left.duplicated(["_name_key", "_address_key"], keep=False).sum()
+            left_valid.duplicated(["_name_key", "_address_key"], keep=False).sum()
         ),
         "annotation_duplicate_name_address": int(
-            right.duplicated(["_name_key", "_address_key"], keep=False).sum()
+            right_valid.duplicated(["_name_key", "_address_key"], keep=False).sum()
         ),
-        "exact_name_address_matches": int(len(exact_matches)),
-        "join_coverage_vs_annotations": round(
+        "exact_valid_name_address_matches": int(len(exact_matches)),
+        "join_coverage_vs_all_annotations": round(
             len(exact_matches) / len(annotated), 4
         ) if len(annotated) else 0.0,
+        "join_coverage_vs_valid_annotations": round(
+            len(exact_matches) / int(valid_right.sum()), 4
+        ) if int(valid_right.sum()) else 0.0,
         "catalog_null_rates": null_rates,
         **coordinate_stats,
     }
