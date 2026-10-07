@@ -1,0 +1,92 @@
+name: Semantic category calibration
+
+on:
+  workflow_dispatch:
+    inputs:
+      category:
+        description: Category to evaluate atomically
+        required: true
+        default: museum
+        type: string
+      sample_size:
+        description: Maximum calibration rows
+        required: true
+        default: "240"
+        type: string
+      model:
+        description: OpenAI model
+        required: true
+        default: gpt-6-luna
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install project
+        run: pip install -e ".[dev]"
+
+      - name: Run unit tests
+        run: pytest -q
+
+      - name: Check API credential
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY GitHub Actions secret is required for semantic calibration."
+            exit 1
+          fi
+
+      - name: Download official London dataset
+        run: python -m src.data.download_london
+
+      - name: Build real evaluation set and deterministic baseline
+        run: |
+          python -m src.data.run_phase1
+          python -m src.evaluation.run_phase2
+
+      - name: Run atomic semantic evaluator
+        run: |
+          python -m src.semantic.run_phase3             --category "${{ inputs.category }}"             --sample-size "${{ inputs.sample_size }}"             --model "${{ inputs.model }}"
+
+      - name: Prepare report
+        run: |
+          mkdir -p reports/phase3
+          cp "data/processed/semantic_${{ inputs.category }}_v1_summary.json" reports/phase3/
+
+      - name: Upload full calibration artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: semantic-${{ inputs.category }}-calibration
+          path: |
+            data/processed/semantic_${{ inputs.category }}_v1_calibration.csv
+            data/processed/semantic_${{ inputs.category }}_v1_disagreements.csv
+            data/processed/semantic_${{ inputs.category }}_v1_summary.json
+          retention-days: 30
+
+      - name: Commit summary report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/phase3
+          if git diff --cached --quiet; then
+            echo "No report changes to commit."
+          else
+            git commit -m "eval: add semantic ${{ inputs.category }} calibration results"
+            git push
+          fi

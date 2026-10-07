@@ -1,0 +1,76 @@
+version: category_ontology_v1
+scope_note: >-
+  These are project business definitions used to make evaluator behavior explicit and auditable.
+  The London dataset publishes human labels for 12 categories but does not publish the annotators'
+  full decision rubric. Therefore evaluator-vs-ground-truth disagreements can represent either model
+  error or ontology mismatch and must be inspected during calibration.
+
+categories:
+  museum:
+    definition: >-
+      A visitor-oriented institution, heritage site, or interpretive venue whose primary function is
+      to preserve, collect, interpret, or display historical, scientific, cultural, artistic, or other
+      material for public learning or viewing.
+    include:
+      - Named museums and collections open to visitors.
+      - Heritage or historical sites that operate primarily as interpretive museum experiences.
+      - Specialized museums even when the word "museum" is absent from the name.
+    exclude:
+      - Commercial art galleries whose primary function is exhibiting or selling contemporary art.
+      - Artist studios, framing shops, retail showrooms, or generic event/exhibition venues.
+      - Buildings that merely contain historical objects but do not operate as visitor-oriented interpretive venues.
+
+  nature:
+    definition: A place where experiencing natural or green outdoor environments is a primary visitor use.
+    include: [parks, gardens, woods, nature reserves, substantial green spaces]
+    exclude: [indoor venues, purely built heritage with no meaningful nature experience]
+
+  walk:
+    definition: A place that materially supports walking, strolling, or pedestrian exploration as a visitor activity.
+    include: [parks, gardens, promenades, walking routes, pedestrian estates]
+    exclude: [venues where walking is only incidental to entering or viewing the attraction]
+
+  drink:
+    definition: A venue where purchasing or consuming beverages is a material part of the visitor experience.
+    include: [pubs, bars, breweries, cocktail venues, social clubs with active beverage service]
+    exclude: [venues where drinks are incidental and not a material visitor proposition]
+
+  restaurant:
+    definition: A venue where prepared food service is a primary visitor proposition.
+    include: [restaurants, cafes, dining venues]
+    exclude: [venues where food is incidental to another primary function]
+
+  nightlife:
+    definition: A venue or place primarily associated with evening or late-night social entertainment.
+    include: [nightclubs, late-night bars, evening entertainment venues]
+    exclude: [daytime attractions with occasional evening events]
+
+  music:
+    definition: A place where live music, music performance, or music culture is a material visitor proposition.
+    include: [music venues, concert halls, recurring live-music venues]
+    exclude: [venues with only incidental background music]
+
+  dance:
+    definition: A place where dance performance, social dancing, or dance participation is a material visitor proposition.
+    include: [dance venues, dance schools with public events, recurring social-dance venues]
+    exclude: [general venues with only occasional dance events]
+
+  history:
+    definition: A place whose visitor proposition materially interprets, preserves, or presents historical people, events, periods, or heritage.
+    include: [heritage sites, historic houses, interpretive memorials, history-focused museums]
+    exclude: [old buildings with no meaningful historical interpretation]
+
+  sports:
+    definition: A place where watching, learning, or participating in sport is a material visitor proposition.
+    include: [stadiums, sports clubs, sports facilities, activity parks]
+    exclude: [green spaces where sport is merely possible but not a meaningful attraction feature]
+
+  art:
+    definition: A place where visual or performing art is a material visitor proposition.
+    include: [art galleries, arts centres, exhibition spaces, artist-focused visitor venues]
+    exclude: [retail decoration shops or venues with art only as background]
+
+  movie:
+    definition: A place where cinema, film exhibition, or film culture is a material visitor proposition.
+    include: [cinemas, film theatres, film-focused visitor venues]
+    exclude: [general theatres without a film proposition]

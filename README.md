@@ -4,7 +4,7 @@ An eval-driven catalog-quality system for travel marketplace metadata.
 
 ## Current implementation phase
 
-The repository currently establishes the first real-world data source and the category ground-truth ingestion path.
+The repository now contains a real-data ingestion layer, a deterministic category baseline, and the first atomic semantic category evaluator.
 
 ### Data source
 
@@ -29,31 +29,17 @@ Download the public London dataset:
 python -m src.data.download_london
 ```
 
-Inspect the raw files:
-
-```bash
-python -m src.data.inspect_london
-```
-
-Convert the human annotations into a normalized category ground-truth table:
-
-```bash
-python -m src.data.prepare_category_ground_truth
-```
-
 ## Data policy
 
 Real tourism data is used where a suitable open source exists. Synthetic or controlled enrichment will only be introduced for fields that are absent from the open source and are required to test additional quality dimensions.
 
-## Phase 1: profile and normalize the real source
-
-Once the two official CSV files are available under `data/raw/`, run the complete Phase 1 pipeline:
+## Phase 1 — Real-data foundation
 
 ```bash
 python -m src.data.run_phase1
 ```
 
-This produces:
+Outputs:
 
 ```text
 data/processed/london_profile.json
@@ -61,26 +47,13 @@ data/processed/catalog.csv
 data/processed/category_evaluation.csv
 ```
 
-`london_profile.json` is an acceptance gate: semantic evaluation should not begin until join coverage, duplicate rates, missingness and annotation distribution have been inspected.
+The profile is an acceptance gate: semantic evaluation does not start until join coverage, missingness, duplicates and annotation distribution have been inspected.
 
-If automated download is blocked by the hosting environment, download the two files from the official dataset page and place them at:
-
-```text
-data/raw/London.csv
-data/raw/London_annotated.csv
-```
-
-The pipeline itself is independent of the download mechanism.
-
-## Phase 2: deterministic category baseline
-
-After Phase 1 has produced `data/processed/category_evaluation.csv`, run:
+## Phase 2 — Deterministic category baseline
 
 ```bash
 python -m src.evaluation.run_phase2
 ```
-
-The first category evaluator is intentionally deterministic and interpretable. It establishes a measurable baseline before semantic/LLM evaluation is introduced.
 
 Outputs:
 
@@ -92,4 +65,43 @@ data/processed/category_failure_summary.csv
 data/processed/phase2_summary.json
 ```
 
-The main review artifact is the failure set: false positives and false negatives are used to define the next atomic semantic evaluators. See `docs/phase-2-category-baseline.md`.
+The real London baseline shows that lexical matching is insufficient: micro precision is about 56% while micro recall is about 3.5%. See `docs/phase-2-real-results.md`.
+
+## Phase 3 — Atomic semantic category evaluator
+
+The first semantic vertical is `museum`. It was selected because the deterministic baseline has both false negatives and adjacent-category false positives such as galleries.
+
+The evaluator processes **one entity × one category** and returns a strict structured decision:
+
+```json
+{
+  "decision": "member | not_member | uncertain",
+  "confidence": 0.0,
+  "reason_codes": ["..."],
+  "evidence": "..."
+}
+```
+
+Ground-truth labels and deterministic predictions are never sent to the model. They are merged back only after inference for evaluation.
+
+Run locally after Phase 1 and Phase 2:
+
+```bash
+export OPENAI_API_KEY="..."
+python -m src.semantic.run_phase3 \
+  --category museum \
+  --sample-size 240 \
+  --model gpt-6-luna
+```
+
+Or use the manual **Semantic category calibration** GitHub Actions workflow after adding `OPENAI_API_KEY` as a repository Actions secret.
+
+Phase 3 reports deterministic-vs-semantic precision/recall/F1 on the same calibration set, coverage, abstention rate, token usage and disagreement cases. See `docs/phase-3-semantic-evaluator.md`.
+
+## Testing
+
+```bash
+pytest -q
+```
+
+The repository keeps raw data and credentials out of source control. Evaluation summaries are committed; full row-level outputs are retained as GitHub Actions artifacts.
