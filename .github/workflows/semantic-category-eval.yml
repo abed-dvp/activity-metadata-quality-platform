@@ -2,6 +2,10 @@ name: Semantic category calibration
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/semantic-trigger.txt"
     inputs:
       category:
         description: Category to evaluate atomically
