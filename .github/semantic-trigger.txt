@@ -1,1 +1,1 @@
-Trigger Gemini museum calibration: 2026-10-07T18:42:13.033Z
+Trigger Gemini museum calibration after GEMINI_API_KEY added: 2026-10-07T20:55:00+02:00
