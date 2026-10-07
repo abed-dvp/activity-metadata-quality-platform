@@ -125,3 +125,10 @@ See `docs/phase-5-real-results.md`.
 Phase 6 validates `AUTO_MEMBER` and `AUTO_NOT_MEMBER` as separate risk lanes. Cost-only optimization would lower the not-member threshold, but a positive-sensitivity safety constraint prevents auto-rejecting known positive references. Both candidate thresholds therefore remain at 0.98, with production routing still disabled.
 
 See `docs/phase-6-asymmetric-routing.md`.
+
+
+## Category expansion — Nature
+
+After validating the end-to-end framework on `museum`, the second semantic category is `nature`. Its deterministic recall is only 0.47%, making it a strong test of implicit semantic membership rather than lexical matching.
+
+See `docs/category-expansion-nature.md`.
