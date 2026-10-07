@@ -1,0 +1,51 @@
+# Optional aliases for the deterministic category baseline.
+# Keys must match normalized annotation category names.
+# The baseline also derives keywords directly from each category name, so
+# this file is intentionally small and can be extended only after inspecting
+# the real London annotation columns and failure cases.
+aliases:
+  museum:
+    - museum
+    - gallery
+    - exhibition
+    - collection
+  park:
+    - park
+    - garden
+    - gardens
+    - green space
+  architecture:
+    - architecture
+    - architectural
+    - building
+    - landmark
+  shopping:
+    - shop
+    - shopping
+    - market
+    - store
+  religion:
+    - church
+    - cathedral
+    - mosque
+    - temple
+    - abbey
+    - chapel
+  history:
+    - history
+    - historical
+    - heritage
+    - memorial
+  culture:
+    - culture
+    - cultural
+    - theatre
+    - theater
+    - arts
+  food:
+    - food
+    - restaurant
+    - culinary
+    - cafe
+    - café
+    - market
