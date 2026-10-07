@@ -90,7 +90,7 @@ class GeminiGenerateContentProvider:
         self,
         api_key: str,
         model: str = "gemini-3.8-flash",
-        max_retries: int = 3,
+        max_retries: int = 5,
     ) -> None:
         if not api_key:
             raise ValueError("GEMINI_API_KEY is required")
@@ -123,7 +123,7 @@ class GeminiGenerateContentProvider:
                     last_empty_response = response
                     if attempt == self.max_retries - 1:
                         return _empty_response_fallback(response)
-                    time.sleep(2**attempt)
+                    time.sleep(min(2**attempt, 16))
                     continue
 
                 decision = parse_semantic_decision(raw)
