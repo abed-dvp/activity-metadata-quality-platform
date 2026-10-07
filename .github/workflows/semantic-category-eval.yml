@@ -16,7 +16,7 @@ on:
       model:
         description: OpenAI model
         required: true
-        default: gpt-6-luna
+        default: gpt-5.6-luna
         type: string
 
 permissions:

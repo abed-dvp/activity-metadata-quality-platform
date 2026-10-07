@@ -40,7 +40,7 @@ class OpenAIResponsesProvider:
     def __init__(
         self,
         api_key: str,
-        model: str = "gpt-6-luna",
+        model: str = "gpt-5.6-luna",
         timeout_seconds: int = 90,
         max_retries: int = 3,
     ) -> None:

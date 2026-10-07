@@ -103,7 +103,7 @@ A semantic evaluator is not considered production-ready merely because F1 improv
 
 The first provider uses the OpenAI Responses API with strict structured output. Provider access is isolated behind an interface so another provider can be added without changing the evaluation dataset or metric layer.
 
-The model is configuration, not business logic. The default calibration model is `gpt-6-luna`, but the workflow accepts a model input and records the selected model in every result.
+The model is configuration, not business logic. The default calibration model is `gpt-5.6-luna`, but the workflow accepts a model input and records the selected model in every result.
 
 No API credential is stored in source control. GitHub Actions reads `OPENAI_API_KEY` from repository secrets.
 
@@ -113,7 +113,7 @@ After Phase 1 and Phase 2:
 
 ```bash
 export OPENAI_API_KEY="..."
-python -m src.semantic.run_phase3   --category museum   --sample-size 240   --model gpt-6-luna
+python -m src.semantic.run_phase3   --category museum   --sample-size 240   --model gpt-5.6-luna
 ```
 
 On GitHub, use the **Semantic category calibration** workflow after adding the `OPENAI_API_KEY` Actions secret.

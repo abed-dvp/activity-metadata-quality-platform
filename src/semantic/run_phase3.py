@@ -82,7 +82,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run Phase 3 atomic semantic category evaluation.")
     parser.add_argument("--category", default="museum")
     parser.add_argument("--sample-size", type=int, default=240)
-    parser.add_argument("--model", default=os.getenv("OPENAI_MODEL", "gpt-6-luna"))
+    parser.add_argument("--model", default=os.getenv("OPENAI_MODEL", "gpt-5.6-luna"))
     parser.add_argument("--max-workers", type=int, default=5)
     parser.add_argument("--input", type=Path, default=PROCESSED / "category_predictions.csv")
     args = parser.parse_args()

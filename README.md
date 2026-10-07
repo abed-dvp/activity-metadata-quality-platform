@@ -91,7 +91,7 @@ export OPENAI_API_KEY="..."
 python -m src.semantic.run_phase3 \
   --category museum \
   --sample-size 240 \
-  --model gpt-6-luna
+  --model gpt-5.6-luna
 ```
 
 Or use the manual **Semantic category calibration** GitHub Actions workflow after adding `OPENAI_API_KEY` as a repository Actions secret.
