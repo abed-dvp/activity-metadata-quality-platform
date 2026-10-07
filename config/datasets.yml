@@ -1,0 +1,24 @@
+london_pois:
+  source_name: "Enriched Tourism Dataset London (POIs)"
+  authors:
+    - "Ramon Hermoso"
+    - "Sergio Ilarri"
+    - "Raquel Trillo-Lado"
+  primary_provider: "Mendeley Data"
+  primary_doi: "10.17632/gw9hjn4v65.2"
+  mirror_provider: "Figshare"
+  mirror_doi: "10.6084/m9.figshare.27628029"
+  license: "CC BY 4.0"
+  expected_clean_rows: 2341
+  provenance_note: >-
+    Curated London attraction POIs derived from Tourpedia. The annotated file
+    contains human-created multi-label category ground truth.
+  files:
+    london:
+      filename: "London.csv"
+      urls:
+        - "https://figshare.com/ndownloader/files/50292426"
+    annotations:
+      filename: "London_annotated.csv"
+      urls:
+        - "https://figshare.com/ndownloader/files/56874800"
