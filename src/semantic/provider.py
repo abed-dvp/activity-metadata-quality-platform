@@ -79,12 +79,8 @@ class GeminiGenerateContentProvider:
                     contents=user_prompt,
                     config={
                         "system_instruction": system_prompt,
-                        "response_format": {
-                            "text": {
-                                "mime_type": "application/json",
-                                "schema": decision_json_schema(),
-                            }
-                        },
+                        "response_mime_type": "application/json",
+                        "response_json_schema": decision_json_schema(),
                         "thinking_config": {
                             "thinking_level": "low",
                         },
