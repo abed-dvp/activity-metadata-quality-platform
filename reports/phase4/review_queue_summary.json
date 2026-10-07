@@ -1,0 +1,17 @@
+{
+  "category": "museum",
+  "source_rows": 240,
+  "review_cases": 28,
+  "review_fraction": 0.11666666666666667,
+  "by_reason": {
+    "UNCERTAIN": 14,
+    "LABEL_CONFLICT": 8,
+    "HIGH_CONFIDENCE_LABEL_CONFLICT": 6
+  },
+  "high_confidence_cases": 6,
+  "categories": [
+    "museum"
+  ],
+  "routing_status": "CALIBRATION_ONLY",
+  "source_workflow_run": 37676146726
+}
