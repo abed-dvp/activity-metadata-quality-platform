@@ -1,0 +1,27 @@
+version: review_routing_v1
+status: calibration_only
+production_enabled: false
+category: museum
+
+review_queue:
+  high_confidence_conflict_threshold: 0.90
+  include_uncertain: true
+  include_label_conflicts: true
+
+candidate_routing:
+  member_threshold: 0.95
+  not_member_threshold: 0.95
+  uncertain_route: HUMAN_REVIEW
+
+threshold_sweep:
+  - 0.80
+  - 0.85
+  - 0.90
+  - 0.95
+  - 0.98
+  - 0.99
+
+notes:
+  - Candidate thresholds are for offline calibration only.
+  - The 240-row museum sample is stratified around baseline failure modes and does not represent production prevalence.
+  - Production thresholds must be frozen only after adjudication and representative holdout validation.
