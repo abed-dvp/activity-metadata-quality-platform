@@ -54,6 +54,7 @@ def _usage_tokens(interaction) -> tuple[int | None, int | None]:
     )
 
 
+# Calibration defaults to low thinking to control cost and latency.
 class GeminiInteractionsProvider:
     def __init__(
         self,
