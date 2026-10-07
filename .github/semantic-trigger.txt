@@ -1,1 +1,1 @@
-Trigger Gemini museum calibration on 2026-10-07.
+Trigger Gemini museum calibration: 2026-10-07T18:42:13.033Z

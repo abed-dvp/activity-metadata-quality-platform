@@ -2,10 +2,6 @@ name: Semantic category calibration
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/semantic-trigger.txt"
     inputs:
       category:
         description: Category to evaluate atomically
@@ -22,6 +18,10 @@ on:
         required: true
         default: gemini-3.8-flash
         type: string
+  push:
+    branches: [main]
+    paths:
+      - ".github/semantic-trigger.txt"
 
 permissions:
   contents: write
@@ -32,6 +32,9 @@ jobs:
     timeout-minutes: 30
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      CATEGORY: ${{ inputs.category || 'museum' }}
+      SAMPLE_SIZE: ${{ inputs.sample_size || '240' }}
+      MODEL: ${{ inputs.model || 'gemini-3.8-flash' }}
 
     steps:
       - name: Checkout
@@ -67,23 +70,23 @@ jobs:
       - name: Run atomic Gemini semantic evaluator
         run: |
           python -m src.semantic.run_phase3 \
-            --category "${{ inputs.category }}" \
-            --sample-size "${{ inputs.sample_size }}" \
-            --model "${{ inputs.model }}"
+            --category "$CATEGORY" \
+            --sample-size "$SAMPLE_SIZE" \
+            --model "$MODEL"
 
       - name: Prepare report
         run: |
           mkdir -p reports/phase3
-          cp "data/processed/semantic_${{ inputs.category }}_v1_summary.json" reports/phase3/
+          cp "data/processed/semantic_${CATEGORY}_v1_summary.json" reports/phase3/
 
       - name: Upload full calibration artifact
         uses: actions/upload-artifact@v4
         with:
-          name: semantic-${{ inputs.category }}-calibration
+          name: semantic-${{ env.CATEGORY }}-calibration
           path: |
-            data/processed/semantic_${{ inputs.category }}_v1_calibration.csv
-            data/processed/semantic_${{ inputs.category }}_v1_disagreements.csv
-            data/processed/semantic_${{ inputs.category }}_v1_summary.json
+            data/processed/semantic_${{ env.CATEGORY }}_v1_calibration.csv
+            data/processed/semantic_${{ env.CATEGORY }}_v1_disagreements.csv
+            data/processed/semantic_${{ env.CATEGORY }}_v1_summary.json
           retention-days: 30
 
       - name: Commit summary report
@@ -94,6 +97,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No report changes to commit."
           else
-            git commit -m "eval: add Gemini semantic ${{ inputs.category }} calibration results"
+            git commit -m "eval: add Gemini semantic ${CATEGORY} calibration results"
             git push
           fi
