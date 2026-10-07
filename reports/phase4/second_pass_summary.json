@@ -1,0 +1,13 @@
+{
+  "first_pass_candidate_cases": 17,
+  "second_pass_stable_cases": 16,
+  "second_pass_changed_to_ambiguous": 1,
+  "stability_rate": 0.9411764705882353,
+  "changed_case": "Red Gate Gallery",
+  "final_candidate_gold_cases": 16,
+  "final_ambiguous_cases": 12,
+  "reviewer_type": "assistant_second_pass",
+  "review_status": "SECOND_PASS_ASSISTED_REVIEW",
+  "human_gold_status": "NOT_FINAL_HUMAN_GOLD",
+  "note": "Second pass used source evidence and ontology; Red Gate Gallery was downgraded to ambiguous due insufficient evidence about institutional vs commercial/generic venue status."
+}

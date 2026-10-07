@@ -1,0 +1,18 @@
+review_case_id,entity_id,name,category,first_pass_label,first_pass_confidence,first_pass_resolution,second_pass_label,second_pass_confidence,second_pass_resolution,stable
+london_poi_247772.0::museum,london_poi_247772.0,Old Operating Theatre Museum & Herb Garret,museum,member,0.99,PUBLIC_LABEL_ERROR,member,0.99,PUBLIC_LABEL_ERROR,True
+london_poi_246990.0::museum,london_poi_246990.0,Guildhall,museum,not_member,0.9,PUBLIC_LABEL_ERROR,not_member,0.9,PUBLIC_LABEL_ERROR,True
+london_poi_247405.0::museum,london_poi_247405.0,Science Museum IMAX,museum,not_member,0.9,ONTOLOGY_MISMATCH,not_member,0.9,ONTOLOGY_MISMATCH,True
+london_poi_36669.0::museum,london_poi_36669.0,Orleans House Gallery,museum,member,0.85,PUBLIC_LABEL_ERROR,member,0.85,PUBLIC_LABEL_ERROR,True
+london_poi_35622.0::museum,london_poi_35622.0,Somerset House,museum,not_member,0.85,ONTOLOGY_MISMATCH,not_member,0.85,ONTOLOGY_MISMATCH,True
+london_poi_40056.0::museum,london_poi_40056.0,The Rag Factory,museum,not_member,0.95,PUBLIC_LABEL_ERROR,not_member,0.95,PUBLIC_LABEL_ERROR,True
+london_poi_61837.0::museum,london_poi_61837.0,White Cube,museum,not_member,0.98,PUBLIC_LABEL_ERROR,not_member,0.98,PUBLIC_LABEL_ERROR,True
+london_poi_40397.0::museum,london_poi_40397.0,Maureen Paley,museum,not_member,0.95,PUBLIC_LABEL_ERROR,not_member,0.95,PUBLIC_LABEL_ERROR,True
+london_poi_249762.0::museum,london_poi_249762.0,National Maritime Museum Gardens,museum,not_member,0.85,ONTOLOGY_MISMATCH,not_member,0.85,ONTOLOGY_MISMATCH,True
+london_poi_246559.0::museum,london_poi_246559.0,GV Art,museum,not_member,0.8,AGREEMENT_AFTER_REVIEW,not_member,0.8,AGREEMENT_AFTER_REVIEW,True
+london_poi_246991.0::museum,london_poi_246991.0,Guildhall Art Gallery,museum,member,0.98,PUBLIC_LABEL_ERROR,member,0.98,PUBLIC_LABEL_ERROR,True
+london_poi_35761.0::museum,london_poi_35761.0,Serpentine Gallery,museum,member,0.9,PUBLIC_LABEL_ERROR,member,0.9,PUBLIC_LABEL_ERROR,True
+london_poi_246864.0::museum,london_poi_246864.0,The Portable Antiquities Scheme,museum,not_member,0.95,PUBLIC_LABEL_ERROR,not_member,0.95,PUBLIC_LABEL_ERROR,True
+london_poi_35768.0::museum,london_poi_35768.0,South London Gallery,museum,member,0.9,PUBLIC_LABEL_ERROR,member,0.9,PUBLIC_LABEL_ERROR,True
+london_poi_35550.0::museum,london_poi_35550.0,The Photographers' Gallery,museum,member,0.95,PUBLIC_LABEL_ERROR,member,0.95,PUBLIC_LABEL_ERROR,True
+london_poi_35762.0::museum,london_poi_35762.0,Kew Bridge Steam Museum,museum,member,0.99,PUBLIC_LABEL_ERROR,member,0.99,PUBLIC_LABEL_ERROR,True
+london_poi_40490.0::museum,london_poi_40490.0,Red Gate Gallery,museum,not_member,0.95,PUBLIC_LABEL_ERROR,ambiguous,0.6,INSUFFICIENT_EVIDENCE,False
