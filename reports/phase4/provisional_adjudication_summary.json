@@ -1,0 +1,21 @@
+{
+  "review_cases": 28,
+  "candidate_gold_cases": 17,
+  "ambiguous_cases": 11,
+  "reviewer_type": "assistant_first_pass",
+  "review_status": "PROVISIONAL_ASSISTED_REVIEW",
+  "reviewer_label_counts": {
+    "ambiguous": 11,
+    "not_member": 10,
+    "member": 7
+  },
+  "resolution_counts": {
+    "PUBLIC_LABEL_ERROR": 13,
+    "INSUFFICIENT_EVIDENCE": 11,
+    "ONTOLOGY_MISMATCH": 3,
+    "AGREEMENT_AFTER_REVIEW": 1
+  },
+  "gemini_agrees_with_candidate_gold": 14,
+  "public_label_agrees_with_candidate_gold": 1,
+  "note": "These are provisional assisted-review decisions, not final human gold."
+}

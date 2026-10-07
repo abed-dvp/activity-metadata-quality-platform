@@ -15,6 +15,8 @@ ResolutionType = Literal[
     "INSUFFICIENT_EVIDENCE",
     "AGREEMENT_AFTER_REVIEW",
 ]
+ReviewerType = Literal["human", "assistant_first_pass"]
+ReviewStatus = Literal["FINAL_HUMAN_REVIEW", "PROVISIONAL_ASSISTED_REVIEW"]
 
 
 @dataclass(frozen=True)
@@ -25,6 +27,8 @@ class Adjudication:
     resolution_type: ResolutionType
     reviewer_notes: str
     reviewer_id: str
+    reviewer_type: ReviewerType
+    review_status: ReviewStatus
     reviewed_at: str
 
     def to_dict(self) -> dict:
@@ -38,6 +42,8 @@ def make_adjudication(
     resolution_type: ResolutionType,
     reviewer_notes: str = "",
     reviewer_id: str = "anonymous",
+    reviewer_type: ReviewerType = "human",
+    review_status: ReviewStatus = "FINAL_HUMAN_REVIEW",
 ) -> Adjudication:
     if reviewer_label not in {"member", "not_member", "ambiguous"}:
         raise ValueError("Invalid reviewer_label")
@@ -46,8 +52,15 @@ def make_adjudication(
         "INSUFFICIENT_EVIDENCE", "AGREEMENT_AFTER_REVIEW",
     }:
         raise ValueError("Invalid resolution_type")
+    if reviewer_type not in {"human", "assistant_first_pass"}:
+        raise ValueError("Invalid reviewer_type")
+    if review_status not in {"FINAL_HUMAN_REVIEW", "PROVISIONAL_ASSISTED_REVIEW"}:
+        raise ValueError("Invalid review_status")
+    if reviewer_type == "assistant_first_pass" and review_status == "FINAL_HUMAN_REVIEW":
+        raise ValueError("Assistant first-pass review cannot be marked final human review")
     if not 0 <= float(reviewer_confidence) <= 1:
         raise ValueError("reviewer_confidence must be between 0 and 1")
+
     return Adjudication(
         review_case_id=review_case_id,
         reviewer_label=reviewer_label,
@@ -55,6 +68,8 @@ def make_adjudication(
         resolution_type=resolution_type,
         reviewer_notes=str(reviewer_notes).strip(),
         reviewer_id=str(reviewer_id).strip() or "anonymous",
+        reviewer_type=reviewer_type,
+        review_status=review_status,
         reviewed_at=datetime.now(timezone.utc).isoformat(),
     )
 

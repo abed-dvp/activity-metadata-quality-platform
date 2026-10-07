@@ -13,19 +13,38 @@ def build_adjudicated_gold(reviewed_queue: pd.DataFrame) -> pd.DataFrame:
         raise ValueError(f"Missing required columns: {sorted(missing)}")
 
     reviewed = reviewed_queue.loc[reviewed_queue["reviewer_label"].notna()].copy()
+
+    if "reviewer_type" not in reviewed.columns:
+        reviewed["reviewer_type"] = "human"
+    if "review_status" not in reviewed.columns:
+        reviewed["review_status"] = "FINAL_HUMAN_REVIEW"
+
     reviewed["adjudicated_label"] = reviewed["reviewer_label"].map(
         {"member": 1, "not_member": 0, "ambiguous": pd.NA}
     ).astype("Int64")
-    reviewed["gold_status"] = reviewed["reviewer_label"].map(
-        {"member": "ADJUDICATED", "not_member": "ADJUDICATED", "ambiguous": "AMBIGUOUS"}
-    )
-    reviewed["label_origin"] = "human_adjudication"
+
+    def gold_status(row: pd.Series) -> str:
+        if row["review_status"] == "FINAL_HUMAN_REVIEW":
+            return "AMBIGUOUS" if row["reviewer_label"] == "ambiguous" else "ADJUDICATED"
+        return (
+            "PROVISIONAL_AMBIGUOUS"
+            if row["reviewer_label"] == "ambiguous"
+            else "CANDIDATE_NOT_HUMAN_FINAL"
+        )
+
+    reviewed["gold_status"] = reviewed.apply(gold_status, axis=1)
+    reviewed["label_origin"] = reviewed["review_status"].map(
+        {
+            "FINAL_HUMAN_REVIEW": "human_adjudication",
+            "PROVISIONAL_ASSISTED_REVIEW": "assisted_adjudication_candidate",
+        }
+    ).fillna("unknown_review_origin")
 
     cols = [
         "review_case_id", "entity_id", "name", "category", "is_member",
         "adjudicated_label", "gold_status", "reviewer_confidence",
-        "resolution_type", "reviewer_notes", "reviewer_id", "reviewed_at",
-        "label_origin",
+        "resolution_type", "reviewer_notes", "reviewer_id", "reviewer_type",
+        "review_status", "reviewed_at", "label_origin",
     ]
     return reviewed[[c for c in cols if c in reviewed.columns]]
 

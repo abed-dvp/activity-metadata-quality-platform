@@ -39,7 +39,7 @@ def test_review_queue_only_contains_unresolved_cases():
     assert review_queue_summary(queue)["review_cases"] == 2
 
 
-def test_adjudication_becomes_gold_and_regression_case():
+def test_final_human_adjudication_becomes_gold_and_regression_case():
     queue = build_review_queue(fixture())
     record = make_adjudication(
         queue.iloc[0]["review_case_id"],
@@ -58,9 +58,50 @@ def test_adjudication_becomes_gold_and_regression_case():
 
     assert len(gold) == 1
     assert gold.iloc[0]["adjudicated_label"] == 0
+    assert gold.iloc[0]["gold_status"] == "ADJUDICATED"
     assert gold.iloc[0]["label_origin"] == "human_adjudication"
     assert len(regression) == 1
     assert regression.iloc[0]["expected_label"] == 0
+
+
+def test_assisted_review_stays_candidate_and_out_of_regression():
+    queue = build_review_queue(fixture())
+    record = make_adjudication(
+        queue.iloc[0]["review_case_id"],
+        "not_member",
+        0.90,
+        "PUBLIC_LABEL_ERROR",
+        "assistant first pass",
+        "assistant",
+        reviewer_type="assistant_first_pass",
+        review_status="PROVISIONAL_ASSISTED_REVIEW",
+    )
+    reviewed = merge_adjudications(
+        queue,
+        pd.DataFrame([record.to_dict()]),
+    )
+    gold = build_adjudicated_gold(reviewed)
+    regression = build_regression_set(reviewed)
+
+    assert len(gold) == 1
+    assert gold.iloc[0]["gold_status"] == "CANDIDATE_NOT_HUMAN_FINAL"
+    assert gold.iloc[0]["label_origin"] == "assisted_adjudication_candidate"
+    assert regression.empty
+
+
+def test_assistant_review_cannot_claim_final_human_status():
+    try:
+        make_adjudication(
+            "a::museum",
+            "member",
+            0.9,
+            "AGREEMENT_AFTER_REVIEW",
+            reviewer_type="assistant_first_pass",
+            review_status="FINAL_HUMAN_REVIEW",
+        )
+        assert False, "Expected ValueError"
+    except ValueError:
+        pass
 
 
 def test_upsert_keeps_one_final_record_per_case(tmp_path: Path):

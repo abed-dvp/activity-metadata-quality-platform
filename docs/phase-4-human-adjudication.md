@@ -11,15 +11,13 @@ Gemini decision
       ↓
 uncertain / label conflict
       ↓
-blind-first human review
+blind-first review
       ↓
 resolution classification
       ↓
-adjudicated gold
+adjudicated or candidate gold
       ↓
-regression cases
-      ↓
-future prompt / ontology / routing changes
+regression cases only after final human review
 ```
 
 No new LLM inference is required to prepare this phase.
@@ -34,7 +32,7 @@ The 240-row museum calibration produces **28 review cases**:
 
 Only 11.67% of the calibration sample enters the initial adjudication queue. High-confidence conflicts are reviewed first because they have the highest information value: either the model is confidently wrong, or the label/ontology boundary needs inspection.
 
-## Blind-first review
+## Blind-first human review
 
 The Streamlit review UI deliberately hides both the public label and Gemini result during the first judgement.
 
@@ -64,24 +62,43 @@ Every reviewed case receives one resolution:
 - `INSUFFICIENT_EVIDENCE` — source evidence is not sufficient for a reliable final label.
 - `AGREEMENT_AFTER_REVIEW` — the review does not expose a substantive unresolved conflict.
 
-This prevents every disagreement from being incorrectly counted as model failure.
+## Gold governance
 
-## Gold-set policy
+The system distinguishes review provenance.
 
-A reviewed `member` or `not_member` case becomes:
+A final human judgement:
+
+```text
+reviewer_type = human
+review_status = FINAL_HUMAN_REVIEW
+```
+
+can become:
 
 ```text
 label_origin = human_adjudication
 gold_status = ADJUDICATED
 ```
 
-An `ambiguous` case remains:
+and is eligible for regression.
+
+An assistant first pass:
 
 ```text
-gold_status = AMBIGUOUS
+reviewer_type = assistant_first_pass
+review_status = PROVISIONAL_ASSISTED_REVIEW
 ```
 
-Ambiguous cases remain analyzable but are excluded from regression cases until evidence or ontology improves.
+can only become:
+
+```text
+label_origin = assisted_adjudication_candidate
+gold_status = CANDIDATE_NOT_HUMAN_FINAL
+```
+
+and is **not** eligible for regression until a human reviewer finalizes it.
+
+Ambiguous cases remain analyzable but stay out of regression.
 
 ## Confidence routing analysis
 
@@ -102,17 +119,10 @@ A 0.95 threshold illustrates the coverage/accuracy trade-off, but it is **not** 
 
 The museum calibration sample is stratified around deterministic failure modes and does not represent natural production prevalence.
 
-Therefore `config/review_routing.yml` explicitly sets:
-
-```text
-status = calibration_only
-production_enabled = false
-```
-
 Production routing requires:
 
-1. adjudication of the unresolved queue;
-2. an adjudicated gold/regression set;
+1. final human adjudication of unresolved cases;
+2. a human-adjudicated gold/regression set;
 3. a representative holdout sample;
 4. explicit false-positive and false-negative business costs;
 5. threshold validation on the representative holdout.
@@ -144,12 +154,4 @@ python -m src.review.build_gold \
   --regression data/processed/museum_regression_cases.csv
 ```
 
-## Decision gate for Phase 5
-
-Before expanding to more categories or automated remediation, answer:
-
-1. How many apparent semantic errors are true model errors?
-2. How many are public-label errors?
-3. Which ontology boundaries need rewriting?
-4. Which high-confidence mistakes belong in regression tests?
-5. What auto-routing threshold is justified on a representative holdout?
+See `docs/phase-4-assisted-adjudication-results.md` for the first provisional review pass.
