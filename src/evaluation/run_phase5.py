@@ -22,7 +22,7 @@ from src.semantic.sample import build_calibration_sample
 
 ROOT = Path(__file__).resolve().parents[2]
 PROCESSED = ROOT / "data" / "processed"
-REPORTS = ROOT / "reports" / "phase5"
+REPORTS_ROOT = ROOT / "reports" / "categories"
 
 
 def _prompt_hash(system_prompt: str, user_prompt: str) -> str:
@@ -175,13 +175,16 @@ def main() -> None:
         ),
     }
 
+    reports = REPORTS_ROOT / args.category / "phase5"
     PROCESSED.mkdir(parents=True, exist_ok=True)
-    REPORTS.mkdir(parents=True, exist_ok=True)
-    evaluated.to_csv(PROCESSED / "museum_phase5_holdout_evaluated.csv", index=False)
-    representative.to_csv(PROCESSED / "museum_phase5_representative.csv", index=False)
-    positives.to_csv(PROCESSED / "museum_phase5_positive_diagnostic.csv", index=False)
-    sweep.to_csv(REPORTS / "routing_threshold_sweep_holdout.csv", index=False)
-    (REPORTS / "holdout_summary.json").write_text(
+    reports.mkdir(parents=True, exist_ok=True)
+
+    prefix = f"{args.category}_phase5"
+    evaluated.to_csv(PROCESSED / f"{prefix}_holdout_evaluated.csv", index=False)
+    representative.to_csv(PROCESSED / f"{prefix}_representative.csv", index=False)
+    positives.to_csv(PROCESSED / f"{prefix}_positive_diagnostic.csv", index=False)
+    sweep.to_csv(reports / "routing_threshold_sweep_holdout.csv", index=False)
+    (reports / "holdout_summary.json").write_text(
         json.dumps(summary, indent=2), encoding="utf-8"
     )
 
