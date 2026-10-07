@@ -33,7 +33,7 @@ jobs:
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       CATEGORY: ${{ inputs.category || 'museum' }}
-      SAMPLE_SIZE: ${{ inputs.sample_size || '240' }}
+      SAMPLE_SIZE: ${{ inputs.sample_size || '60' }}
       MODEL: ${{ inputs.model || 'gemini-3.8-flash' }}
 
     steps:
