@@ -54,7 +54,6 @@ jobs:
             --category nature \
             --sample-size 240 \
             --model gemini-3.8-flash \
-            --max-workers 2 \
             --max-workers 2
 
       - name: Save calibration summary
@@ -68,7 +67,8 @@ jobs:
           python -m src.evaluation.run_phase5 \
             --category nature \
             --representative-size 600 \
-            --model gemini-3.8-flash
+            --model gemini-3.8-flash \
+            --max-workers 2
 
       - name: Upload nature artifacts
         uses: actions/upload-artifact@v4
