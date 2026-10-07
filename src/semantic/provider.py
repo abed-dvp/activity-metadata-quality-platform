@@ -30,14 +30,12 @@ def _safe_int(value) -> int | None:
         return None
 
 
-def _usage_tokens(interaction) -> tuple[int | None, int | None]:
+def _usage_tokens(response) -> tuple[int | None, int | None]:
     usage = (
-        getattr(interaction, "usage", None)
-        or getattr(interaction, "usage_metadata", None)
-        or getattr(interaction, "usageMetadata", None)
+        getattr(response, "usage_metadata", None)
+        or getattr(response, "usageMetadata", None)
+        or {}
     )
-    if usage is None:
-        return None, None
 
     def read(*names):
         for name in names:
@@ -48,14 +46,15 @@ def _usage_tokens(interaction) -> tuple[int | None, int | None]:
                 return usage[name]
         return None
 
-    return (
-        _safe_int(read("input_tokens", "input_token_count", "prompt_token_count", "promptTokenCount")),
-        _safe_int(read("output_tokens", "output_token_count", "candidates_token_count", "candidatesTokenCount")),
-    )
+    prompt = _safe_int(read("prompt_token_count", "promptTokenCount", "input_tokens"))
+    candidates = _safe_int(read("candidates_token_count", "candidatesTokenCount", "output_tokens"))
+    thoughts = _safe_int(read("thoughts_token_count", "thoughtsTokenCount")) or 0
+
+    output = None if candidates is None and thoughts == 0 else (candidates or 0) + thoughts
+    return prompt, output
 
 
-# Calibration defaults to low thinking to control cost and latency.
-class GeminiInteractionsProvider:
+class GeminiGenerateContentProvider:
     def __init__(
         self,
         api_key: str,
@@ -74,28 +73,32 @@ class GeminiInteractionsProvider:
 
         for attempt in range(self.max_retries):
             try:
-                interaction = self.client.interactions.create(
+                response = self.client.models.generate_content(
                     model=self.model,
-                    system_instruction=system_prompt,
-                    input=user_prompt,
-                    response_format={
-                        "type": "text",
-                        "mime_type": "application/json",
-                        "schema": decision_json_schema(),
-                    },
-                    generation_config={
-                        "thinking_level": "low",
+                    contents=user_prompt,
+                    config={
+                        "system_instruction": system_prompt,
+                        "response_format": {
+                            "text": {
+                                "mime_type": "application/json",
+                                "schema": decision_json_schema(),
+                            }
+                        },
+                        "thinking_config": {
+                            "thinking_level": "low",
+                        },
                     },
                 )
-                raw = interaction.output_text
+
+                raw = response.text
                 if not raw:
-                    raise ValueError("Gemini returned an empty output_text")
+                    raise ValueError("Gemini returned an empty response text")
 
                 decision = parse_semantic_decision(raw)
-                input_tokens, output_tokens = _usage_tokens(interaction)
+                input_tokens, output_tokens = _usage_tokens(response)
                 return ProviderResult(
                     decision=decision,
-                    response_id=getattr(interaction, "id", None),
+                    response_id=getattr(response, "response_id", None),
                     input_tokens=input_tokens,
                     output_tokens=output_tokens,
                 )
