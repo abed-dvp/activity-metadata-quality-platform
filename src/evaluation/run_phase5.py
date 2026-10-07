@@ -18,6 +18,7 @@ from src.evaluation.metrics import binary_metrics
 from src.evaluation.routing import threshold_sweep
 from src.semantic.prompt import PROMPT_VERSION, build_category_prompt, load_ontology
 from src.semantic.provider import GeminiGenerateContentProvider, SemanticProvider
+from src.semantic.sample import build_calibration_sample
 
 ROOT = Path(__file__).resolve().parents[2]
 PROCESSED = ROOT / "data" / "processed"
@@ -81,7 +82,6 @@ def _semantic_metrics(df: pd.DataFrame) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run Phase 5 representative holdout validation.")
     parser.add_argument("--predictions", type=Path, default=PROCESSED / "category_predictions.csv")
-    parser.add_argument("--calibration", type=Path, default=PROCESSED / "semantic_museum_v1_calibration.csv")
     parser.add_argument("--category", default="museum")
     parser.add_argument("--representative-size", type=int, default=600)
     parser.add_argument("--seed", type=int, default=20261007)
@@ -92,12 +92,17 @@ def main() -> None:
     api_key = os.getenv("GEMINI_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY is required")
-    if not args.predictions.exists() or not args.calibration.exists():
-        raise FileNotFoundError("Phase 2 predictions and Phase 3 calibration outputs are required")
+    if not args.predictions.exists():
+        raise FileNotFoundError("Phase 2 predictions are required")
 
     predictions = pd.read_csv(args.predictions)
-    calibration = pd.read_csv(args.calibration)
-    calibration_ids = set(calibration["entity_id"].astype(str))
+    frozen_calibration = build_calibration_sample(
+        predictions,
+        category=args.category,
+        sample_size=240,
+        seed=42,
+    )
+    calibration_ids = set(frozen_calibration["entity_id"].astype(str))
 
     holdout, design = build_representative_holdout(
         predictions=predictions,
