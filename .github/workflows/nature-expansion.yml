@@ -53,7 +53,9 @@ jobs:
           python -m src.semantic.run_phase3 \
             --category nature \
             --sample-size 240 \
-            --model gemini-3.8-flash
+            --model gemini-3.8-flash \
+            --max-workers 2 \
+            --max-workers 2
 
       - name: Save calibration summary
         run: |
