@@ -26,6 +26,14 @@ def _deduplicate_catalog(catalog: pd.DataFrame) -> pd.DataFrame:
     out = catalog.copy()
     out["_name_key"] = _key(out["name"])
     out["_address_key"] = _key(out["address"])
+
+    valid_identity = (
+        out["entity_id"].notna()
+        & out["_name_key"].ne("")
+        & out["_address_key"].ne("")
+    )
+    out = out.loc[valid_identity].copy()
+
     return (
         out.sort_values("entity_id")
         .drop_duplicates(["_name_key", "_address_key"], keep="first")
@@ -40,6 +48,9 @@ def _aggregate_annotations(labels: pd.DataFrame, name_col: str, address_col: str
 
     for category in category_cols:
         out[category] = pd.to_numeric(out[category], errors="coerce").fillna(0).astype(int)
+
+    valid_identity = out["_name_key"].ne("") & out["_address_key"].ne("")
+    out = out.loc[valid_identity].copy()
 
     return (
         out.groupby(["_name_key", "_address_key"], as_index=False)[category_cols]
