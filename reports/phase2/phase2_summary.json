@@ -1,16 +1,16 @@
 {
   "baseline": "deterministic_keyword_v1",
   "threshold": 2.0,
-  "rows": 28032,
-  "entities": 2335,
+  "rows": 27168,
+  "entities": 2264,
   "categories": 12,
-  "gold_positives": 4328,
-  "predicted_positives": 261,
-  "failures": 4295,
-  "micro_precision": 0.5632183908045977,
-  "micro_recall": 0.03396487985212569,
-  "micro_f1": 0.06406624536936151,
-  "macro_precision": 0.48454744397759103,
-  "macro_recall": 0.08039568701036459,
-  "macro_f1": 0.08193208978224444
+  "gold_positives": 4136,
+  "predicted_positives": 259,
+  "failures": 4105,
+  "micro_precision": 0.5598455598455598,
+  "micro_recall": 0.03505802707930367,
+  "micro_f1": 0.06598407281001137,
+  "macro_precision": 0.48020386997596726,
+  "macro_recall": 0.08024833075008986,
+  "macro_f1": 0.08104451622246188
 }
