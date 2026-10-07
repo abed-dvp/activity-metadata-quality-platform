@@ -1,40 +1,40 @@
 {
-  "rows": 60,
-  "decided_rows": 57,
-  "coverage": 0.95,
-  "abstention_rate": 0.05,
+  "rows": 240,
+  "decided_rows": 226,
+  "coverage": 0.9416666666666667,
+  "abstention_rate": 0.058333333333333334,
   "baseline": {
-    "true_positive": 15,
-    "false_positive": 15,
-    "false_negative": 15,
-    "true_negative": 15,
-    "precision": 0.5,
-    "recall": 0.5,
-    "f1": 0.5
+    "true_positive": 62,
+    "false_positive": 60,
+    "false_negative": 30,
+    "true_negative": 88,
+    "precision": 0.5081967213114754,
+    "recall": 0.6739130434782609,
+    "f1": 0.5794392523364487
   },
   "semantic_decided_only": {
-    "true_positive": 25,
-    "false_positive": 2,
-    "false_negative": 3,
-    "true_negative": 27,
-    "precision": 0.9259259259259259,
-    "recall": 0.8928571428571429,
-    "f1": 0.9090909090909091
+    "true_positive": 80,
+    "false_positive": 7,
+    "false_negative": 7,
+    "true_negative": 132,
+    "precision": 0.9195402298850575,
+    "recall": 0.9195402298850575,
+    "f1": 0.9195402298850575
   },
   "semantic_conservative": {
-    "true_positive": 25,
-    "false_positive": 2,
-    "false_negative": 5,
-    "true_negative": 28,
-    "precision": 0.9259259259259259,
-    "recall": 0.8333333333333334,
-    "f1": 0.8771929824561403
+    "true_positive": 80,
+    "false_positive": 7,
+    "false_negative": 12,
+    "true_negative": 141,
+    "precision": 0.9195402298850575,
+    "recall": 0.8695652173913043,
+    "f1": 0.8938547486033519
   },
   "category": "museum",
-  "sample_size": 60,
+  "sample_size": 240,
   "model": "gemini-3.8-flash",
   "provider": "google_gemini_generate_content",
   "prompt_version": "category_membership_v1",
-  "input_tokens": 34652,
-  "output_tokens": 6796
+  "input_tokens": 134034,
+  "output_tokens": 24517
 }
