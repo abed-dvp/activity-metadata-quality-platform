@@ -34,6 +34,7 @@ def _usage_tokens(response) -> tuple[int | None, int | None]:
     usage = (
         getattr(response, "usage_metadata", None)
         or getattr(response, "usageMetadata", None)
+        or getattr(response, "usage", None)
         or {}
     )
 
