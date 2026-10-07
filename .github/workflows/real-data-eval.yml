@@ -1,0 +1,92 @@
+name: Real London evaluation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/real-data-eval.yml"
+      - "src/**"
+      - "tests/**"
+      - "config/**"
+      - "pyproject.toml"
+
+permissions:
+  contents: write
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run unit tests
+        run: pytest -q
+
+      - name: Download official London dataset
+        run: |
+          mkdir -p data/raw
+          curl -L --fail --retry 3 --retry-delay 2 \
+            "https://figshare.com/ndownloader/files/50292426" \
+            -o data/raw/London.csv
+          curl -L --fail --retry 3 --retry-delay 2 \
+            "https://figshare.com/ndownloader/files/56874800" \
+            -o data/raw/London_annotated.csv
+          test -s data/raw/London.csv
+          test -s data/raw/London_annotated.csv
+          echo "London.csv bytes: $(wc -c < data/raw/London.csv)"
+          echo "London_annotated.csv bytes: $(wc -c < data/raw/London_annotated.csv)"
+          sha256sum data/raw/London.csv data/raw/London_annotated.csv
+
+      - name: Run Phase 1 data foundation
+        run: python -m src.data.run_phase1
+
+      - name: Run Phase 2 deterministic baseline
+        run: python -m src.evaluation.run_phase2
+
+      - name: Prepare reproducible reports
+        run: |
+          mkdir -p reports/phase2
+          cp data/processed/london_profile.json reports/phase2/
+          cp data/processed/category_metrics.csv reports/phase2/
+          cp data/processed/category_failure_summary.csv reports/phase2/
+          cp data/processed/phase2_summary.json reports/phase2/
+
+      - name: Upload full evaluation outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: london-phase2-evaluation
+          path: |
+            data/processed/category_predictions.csv
+            data/processed/category_failures.csv
+            data/processed/category_metrics.csv
+            data/processed/category_failure_summary.csv
+            data/processed/phase2_summary.json
+            data/processed/london_profile.json
+          retention-days: 30
+
+      - name: Commit evaluation reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/phase2
+          if git diff --cached --quiet; then
+            echo "No report changes to commit."
+          else
+            git commit -m "data: add real London baseline evaluation"
+            git push
+          fi
