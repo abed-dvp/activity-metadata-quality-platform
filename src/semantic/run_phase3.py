@@ -11,7 +11,7 @@ import pandas as pd
 
 from src.evaluation.semantic_report import evaluate_semantic_sample
 from src.semantic.prompt import PROMPT_VERSION, build_category_prompt, load_ontology
-from src.semantic.provider import GeminiInteractionsProvider, SemanticProvider
+from src.semantic.provider import GeminiGenerateContentProvider, SemanticProvider
 from src.semantic.sample import build_calibration_sample
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -70,7 +70,7 @@ def run_semantic_evaluation(
             "category": category,
             "sample_size": int(len(merged)),
             "model": provider.model,
-            "provider": "google_gemini_interactions",
+            "provider": "google_gemini_generate_content",
             "prompt_version": PROMPT_VERSION,
             "input_tokens": int(pd.to_numeric(merged["input_tokens"], errors="coerce").fillna(0).sum()),
             "output_tokens": int(pd.to_numeric(merged["output_tokens"], errors="coerce").fillna(0).sum()),
@@ -100,7 +100,7 @@ def main() -> None:
         )
 
     predictions = pd.read_csv(args.input)
-    provider = GeminiInteractionsProvider(api_key=api_key, model=args.model)
+    provider = GeminiGenerateContentProvider(api_key=api_key, model=args.model)
     evaluated, summary = run_semantic_evaluation(
         predictions=predictions,
         provider=provider,
