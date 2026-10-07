@@ -1,0 +1,14 @@
+entity_id,name,public_label,gemini_decision,gemini_confidence,candidate_label,resolution_type,reviewer_type,review_status
+london_poi_249189.0,Carlyle's House,0,member,0.95,1,PUBLIC_LABEL_ERROR,assistant_phase6_second_pass,ASSISTED_CANDIDATE
+london_poi_35682.0,Queen's House,0,member,0.95,1,PUBLIC_LABEL_ERROR,assistant_phase6_second_pass,ASSISTED_CANDIDATE
+london_poi_62821.0,The House Mill,0,member,0.88,1,PUBLIC_LABEL_ERROR,assistant_phase6_second_pass,ASSISTED_CANDIDATE
+london_poi_41804.0,Zabludowicz Collection,0,member,0.90,1,PUBLIC_LABEL_ERROR,assistant_phase6_second_pass,ASSISTED_CANDIDATE
+london_poi_248439.0,Whitechapel Gallery,0,member,0.90,1,PUBLIC_LABEL_ERROR,assistant_phase6_second_pass,ASSISTED_CANDIDATE
+london_poi_48489.0,Kew Palace,0,member,0.95,1,PUBLIC_LABEL_ERROR,assistant_phase6_second_pass,ASSISTED_CANDIDATE
+london_poi_247651.0,The Courtauld Institute of Art,0,member,0.95,1,PUBLIC_LABEL_ERROR,assistant_phase6_second_pass,ASSISTED_CANDIDATE
+london_poi_64847.0,Cutty Sark,0,member,0.95,1,PUBLIC_LABEL_ERROR,assistant_phase6_second_pass,ASSISTED_CANDIDATE
+london_poi_245710.0,PM Gallery & House,0,member,0.85,1,ONTOLOGY_MISMATCH,assistant_phase6_second_pass,ASSISTED_CANDIDATE
+london_poi_248431.0,The Graffiti Life Gallery,1,not_member,0.85,0,PUBLIC_LABEL_ERROR,assistant_phase6_second_pass,ASSISTED_CANDIDATE
+london_poi_35756.0,National Gallery Shop,1,uncertain,0.55,0,ENTITY_BOUNDARY_ERROR,assistant_phase6_second_pass,ASSISTED_CANDIDATE
+london_poi_40314.0,Stolenspace Gallery,1,not_member,0.95,0,PUBLIC_LABEL_ERROR,assistant_phase6_second_pass,ASSISTED_CANDIDATE
+london_poi_245539.0,The Electric Lounge,0,uncertain,0.00,0,PROVIDER_ERROR_CORRECTLY_ROUTED,assistant_phase6_second_pass,ASSISTED_CANDIDATE

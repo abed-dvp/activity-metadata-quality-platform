@@ -1,0 +1,21 @@
+version: routing_cost_scenarios_v1
+
+# These are normalized sensitivity-analysis units, not euros or business P&L.
+# They are used to see whether threshold choices are stable under different
+# relative error-cost assumptions.
+
+profiles:
+  balanced:
+    wrong_member_cost: 7
+    wrong_not_member_cost: 7
+    review_cost: 1
+
+  precision_first:
+    wrong_member_cost: 10
+    wrong_not_member_cost: 5
+    review_cost: 1
+
+  discovery_protection:
+    wrong_member_cost: 5
+    wrong_not_member_cost: 10
+    review_cost: 1

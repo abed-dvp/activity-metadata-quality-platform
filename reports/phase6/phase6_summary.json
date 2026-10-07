@@ -1,0 +1,18 @@
+{
+  "phase": "phase6_asymmetric_routing",
+  "holdout_disagreements_reviewed": 13,
+  "assisted_public_label_errors": 10,
+  "assisted_ontology_mismatches": 1,
+  "assisted_entity_boundary_errors": 1,
+  "provider_errors_reviewed": 1,
+  "candidate_member_threshold": 0.98,
+  "candidate_not_member_threshold": 0.98,
+  "production_enabled": false,
+  "cost_only_unconstrained_optimum": {
+    "member_threshold": 0.98,
+    "not_member_threshold": 0.80
+  },
+  "safety_override_reason": "A 0.80 not-member threshold auto-rejects two public-positive sensitivity cases. Independent human gold is not yet sufficient to waive that safety signal.",
+  "cost_units": "normalized_sensitivity_units_not_currency",
+  "reference_status": "ASSISTED_CANDIDATE_NOT_FINAL_HUMAN_GOLD"
+}

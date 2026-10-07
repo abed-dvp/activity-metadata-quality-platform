@@ -118,3 +118,10 @@ Phase 5 excludes the full Phase 3 calibration set and validates the frozen museu
 The representative 600-row holdout achieved 95.3% model coverage. A conservative confidence threshold of 0.98 produced 60.2% auto-route coverage with zero errors against the public-label reference in that sample. Production routing remains disabled because Phase 4 identified probable annotation/ontology mismatches.
 
 See `docs/phase-5-real-results.md`.
+
+
+## Phase 6 — Asymmetric routing validation
+
+Phase 6 validates `AUTO_MEMBER` and `AUTO_NOT_MEMBER` as separate risk lanes. Cost-only optimization would lower the not-member threshold, but a positive-sensitivity safety constraint prevents auto-rejecting known positive references. Both candidate thresholds therefore remain at 0.98, with production routing still disabled.
+
+See `docs/phase-6-asymmetric-routing.md`.

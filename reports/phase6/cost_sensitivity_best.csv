@@ -1,0 +1,4 @@
+profile,wrong_member_cost,wrong_not_member_cost,review_cost,member_threshold,not_member_threshold,auto_rows,review_rows,wrong_member,wrong_not_member,normalized_cost
+balanced,7,7,1,0.98,0.8,575,48,0,2,62
+discovery_protection,5,10,1,0.98,0.8,575,48,0,2,68
+precision_first,10,5,1,0.98,0.8,575,48,0,2,58

@@ -1,0 +1,7 @@
+threshold,auto_member_rows,auto_member_public_errors,auto_member_assisted_errors,auto_not_member_rows_representative,auto_not_member_public_errors_representative,public_positive_diagnostic_auto_rejects,assisted_positive_diagnostic_auto_rejects
+0.8,17,9,0,555,0,2,0
+0.85,17,9,0,553,0,2,0
+0.9,15,7,0,526,0,1,0
+0.95,13,5,0,503,0,1,0
+0.98,6,0,0,355,0,0,0
+0.99,1,0,0,332,0,0,0

@@ -1,5 +1,5 @@
-version: review_routing_v1
-status: representative_holdout_validated_candidate
+version: review_routing_v2
+status: phase6_lane_specific_validated_candidate
 production_enabled: false
 category: museum
 
@@ -12,29 +12,33 @@ review_queue:
 candidate_routing:
   member_threshold: 0.98
   not_member_threshold: 0.98
+  thresholds_independently_validated: true
   uncertain_route: HUMAN_REVIEW
   provider_error_route: HUMAN_REVIEW
 
-representative_holdout:
-  rows: 600
-  seed: 20261007
-  public_label_prevalence: 0.013333333333333334
-  candidate_threshold: 0.98
-  auto_coverage_at_candidate: 0.6016666666666667
-  auto_accuracy_vs_public_reference: 1.0
-  auto_errors_vs_public_reference: 0
-  status: OFFLINE_CANDIDATE_ONLY
+member_lane_validation:
+  reference: representative_holdout
+  threshold: 0.98
+  auto_member_rows: 6
+  public_reference_errors: 0
+  assisted_candidate_errors: 0
 
-threshold_sweep:
-  - 0.80
-  - 0.85
-  - 0.90
-  - 0.95
-  - 0.98
-  - 0.99
+not_member_lane_validation:
+  representative_reference_errors_at_0_98: 0
+  positive_sensitivity_auto_rejects_at_0_98: 0
+  threshold: 0.98
+
+cost_sensitivity:
+  units: normalized_not_currency
+  unconstrained_member_threshold: 0.98
+  unconstrained_not_member_threshold: 0.80
+  safety_constraint_overrides_cost_optimum: true
+  safety_reason: >-
+    Lower not-member thresholds auto-reject public-positive sensitivity cases
+    that do not yet have independent human-gold adjudication.
 
 notes:
   - Production routing remains disabled.
-  - Phase 4 found probable public-label and ontology mismatches.
-  - The 0.98 threshold is a conservative holdout candidate, not a production SLA.
-  - Final thresholds require independent human adjudication and explicit false-positive/false-negative business costs.
+  - Assisted adjudication is not represented as independent human gold.
+  - Member and not-member thresholds may diverge in future categories.
+  - Every category must pass its own calibration, holdout, and lane validation.
