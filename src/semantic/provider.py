@@ -82,6 +82,9 @@ class GeminiInteractionsProvider:
                         "mime_type": "application/json",
                         "schema": decision_json_schema(),
                     },
+                    generation_config={
+                        "thinking_level": "low",
+                    },
                 )
                 raw = interaction.output_text
                 if not raw:
