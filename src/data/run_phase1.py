@@ -40,7 +40,14 @@ def main() -> None:
     print(f"catalog rows: {len(catalog):,}")
     print(f"evaluation rows: {len(eval_df):,}")
     print(f"categories: {eval_df['category'].nunique():,}")
-    print(f"join coverage vs annotations: {profile['join_coverage_vs_annotations']:.1%}")
+    print(
+        "join coverage vs all annotations: "
+        f"{profile['join_coverage_vs_all_annotations']:.1%}"
+    )
+    print(
+        "join coverage vs valid annotations: "
+        f"{profile['join_coverage_vs_valid_annotations']:.1%}"
+    )
     print(f"outputs: {OUT}")
 
 
