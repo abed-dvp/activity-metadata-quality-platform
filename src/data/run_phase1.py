@@ -7,6 +7,7 @@ import pandas as pd
 from src.data.profile_london import profile_dataset
 from src.data.prepare_london_catalog import prepare_catalog
 from src.data.build_evaluation_dataset import build_evaluation_dataset
+from src.data.io import read_source_csv
 
 ROOT = Path(__file__).resolve().parents[2]
 RAW = ROOT / "data" / "raw"
@@ -22,8 +23,8 @@ def main() -> None:
             "Run `python -m src.data.download_london` or download the two official files manually."
         )
 
-    raw = pd.read_csv(london_path)
-    annotated = pd.read_csv(annotated_path)
+    raw = read_source_csv(london_path)
+    annotated = read_source_csv(annotated_path)
 
     OUT.mkdir(parents=True, exist_ok=True)
 
