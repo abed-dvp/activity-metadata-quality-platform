@@ -1,1 +1,1 @@
-Run nature category expansion.
+Rerun nature category expansion with reduced concurrency.
