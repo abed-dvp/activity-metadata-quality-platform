@@ -5,7 +5,7 @@ import pandas as pd
 from src.evaluation.semantic_report import evaluate_semantic_sample
 from src.semantic.contracts import parse_semantic_decision
 from src.semantic.prompt import build_category_prompt
-from src.semantic.provider import _usage_tokens
+from src.semantic.provider import _usage_tokens, _empty_response_fallback
 from src.semantic.sample import build_calibration_sample
 
 
@@ -90,3 +90,23 @@ def test_gemini_usage_parsing_from_dict_like_payload():
         }
 
     assert _usage_tokens(Interaction()) == (100, 25)
+
+
+def test_empty_response_becomes_operational_abstention():
+    class Candidate:
+        finish_reason = "SAFETY"
+
+    class Response:
+        text = ""
+        response_id = "r1"
+        candidates = [Candidate()]
+        usage = {
+            "promptTokenCount": 12,
+            "candidatesTokenCount": 0,
+        }
+
+    result = _empty_response_fallback(Response())
+    assert result.decision.decision == "uncertain"
+    assert result.decision.confidence == 0.0
+    assert result.provider_error == "EMPTY_RESPONSE"
+    assert "SAFETY" in result.decision.evidence

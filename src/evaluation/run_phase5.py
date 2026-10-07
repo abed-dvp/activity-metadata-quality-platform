@@ -47,6 +47,7 @@ def _evaluate_one(provider: SemanticProvider, row: pd.Series, category: str, ont
         "provider_response_id": result.response_id,
         "input_tokens": result.input_tokens,
         "output_tokens": result.output_tokens,
+        "provider_error": result.provider_error,
     }
 
 
@@ -152,6 +153,7 @@ def main() -> None:
     input_tokens = int(pd.to_numeric(evaluated["input_tokens"], errors="coerce").fillna(0).sum())
     output_tokens = int(pd.to_numeric(evaluated["output_tokens"], errors="coerce").fillna(0).sum())
     estimated_cost_usd = input_tokens / 1_000_000 * 0.75 + output_tokens / 1_000_000 * 3.75
+    provider_error_rows = int(evaluated["provider_error"].notna().sum()) if "provider_error" in evaluated.columns else 0
 
     summary = {
         "phase": "phase5_representative_holdout",
@@ -165,6 +167,7 @@ def main() -> None:
         "input_tokens": input_tokens,
         "output_tokens_including_thinking": output_tokens,
         "estimated_standard_cost_usd_oct_2026": estimated_cost_usd,
+        "provider_error_rows": provider_error_rows,
         "important_caveat": (
             "Public annotations remain the evaluation reference for holdout metrics, "
             "but Phase 4 showed likely annotation/ontology mismatches. These metrics are "

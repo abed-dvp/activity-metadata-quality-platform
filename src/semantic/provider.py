@@ -15,6 +15,7 @@ class ProviderResult:
     response_id: str | None
     input_tokens: int | None
     output_tokens: int | None
+    provider_error: str | None = None
 
 
 class SemanticProvider(Protocol):
@@ -55,6 +56,35 @@ def _usage_tokens(response) -> tuple[int | None, int | None]:
     return prompt, output
 
 
+def _finish_reason(response) -> str | None:
+    candidates = getattr(response, "candidates", None) or []
+    if not candidates:
+        return None
+    reason = getattr(candidates[0], "finish_reason", None) or getattr(candidates[0], "finishReason", None)
+    return str(reason) if reason is not None else None
+
+
+def _empty_response_fallback(response) -> ProviderResult:
+    input_tokens, output_tokens = _usage_tokens(response)
+    finish_reason = _finish_reason(response)
+    suffix = f" finish_reason={finish_reason}" if finish_reason else ""
+    return ProviderResult(
+        decision=SemanticDecision(
+            decision="uncertain",
+            confidence=0.0,
+            reason_codes=("INSUFFICIENT_EVIDENCE",),
+            evidence=(
+                "Gemini returned no usable text after retries; "
+                "route this case to human review." + suffix
+            ),
+        ),
+        response_id=getattr(response, "response_id", None),
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        provider_error="EMPTY_RESPONSE",
+    )
+
+
 class GeminiGenerateContentProvider:
     def __init__(
         self,
@@ -71,6 +101,7 @@ class GeminiGenerateContentProvider:
 
     def evaluate(self, system_prompt: str, user_prompt: str) -> ProviderResult:
         last_error: Exception | None = None
+        last_empty_response = None
 
         for attempt in range(self.max_retries):
             try:
@@ -89,7 +120,11 @@ class GeminiGenerateContentProvider:
 
                 raw = response.text
                 if not raw:
-                    raise ValueError("Gemini returned an empty response text")
+                    last_empty_response = response
+                    if attempt == self.max_retries - 1:
+                        return _empty_response_fallback(response)
+                    time.sleep(2**attempt)
+                    continue
 
                 decision = parse_semantic_decision(raw)
                 input_tokens, output_tokens = _usage_tokens(response)
@@ -98,12 +133,16 @@ class GeminiGenerateContentProvider:
                     response_id=getattr(response, "response_id", None),
                     input_tokens=input_tokens,
                     output_tokens=output_tokens,
+                    provider_error=None,
                 )
             except Exception as exc:
                 last_error = exc
                 if attempt == self.max_retries - 1:
                     break
                 time.sleep(2**attempt)
+
+        if last_empty_response is not None and last_error is None:
+            return _empty_response_fallback(last_empty_response)
 
         raise RuntimeError(
             f"Gemini semantic provider failed after {self.max_retries} attempts: "

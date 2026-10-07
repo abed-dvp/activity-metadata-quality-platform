@@ -40,6 +40,7 @@ def _evaluate_one(provider: SemanticProvider, row: pd.Series, category: str, ont
         "provider_response_id": result.response_id,
         "input_tokens": result.input_tokens,
         "output_tokens": result.output_tokens,
+        "provider_error": result.provider_error,
     }
 
 
@@ -74,6 +75,7 @@ def run_semantic_evaluation(
             "prompt_version": PROMPT_VERSION,
             "input_tokens": int(pd.to_numeric(merged["input_tokens"], errors="coerce").fillna(0).sum()),
             "output_tokens": int(pd.to_numeric(merged["output_tokens"], errors="coerce").fillna(0).sum()),
+            "provider_error_rows": int(merged["provider_error"].notna().sum()) if "provider_error" in merged.columns else 0,
         }
     )
     return merged, summary
