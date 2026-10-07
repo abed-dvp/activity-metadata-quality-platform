@@ -109,3 +109,12 @@ pytest -q
 ```
 
 Raw data, credentials, row-level semantic outputs, and reviewer work products remain outside source control by default. Compact evaluation summaries and design decisions are committed for auditability.
+
+
+## Phase 5 — Representative holdout
+
+Phase 5 excludes the full Phase 3 calibration set and validates the frozen museum evaluator on residual data.
+
+The representative 600-row holdout achieved 95.3% model coverage. A conservative confidence threshold of 0.98 produced 60.2% auto-route coverage with zero errors against the public-label reference in that sample. Production routing remains disabled because Phase 4 identified probable annotation/ontology mismatches.
+
+See `docs/phase-5-real-results.md`.

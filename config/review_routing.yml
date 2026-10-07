@@ -1,5 +1,5 @@
 version: review_routing_v1
-status: calibration_only
+status: representative_holdout_validated_candidate
 production_enabled: false
 category: museum
 
@@ -7,11 +7,23 @@ review_queue:
   high_confidence_conflict_threshold: 0.90
   include_uncertain: true
   include_label_conflicts: true
+  include_provider_errors: true
 
 candidate_routing:
-  member_threshold: 0.95
-  not_member_threshold: 0.95
+  member_threshold: 0.98
+  not_member_threshold: 0.98
   uncertain_route: HUMAN_REVIEW
+  provider_error_route: HUMAN_REVIEW
+
+representative_holdout:
+  rows: 600
+  seed: 20261007
+  public_label_prevalence: 0.013333333333333334
+  candidate_threshold: 0.98
+  auto_coverage_at_candidate: 0.6016666666666667
+  auto_accuracy_vs_public_reference: 1.0
+  auto_errors_vs_public_reference: 0
+  status: OFFLINE_CANDIDATE_ONLY
 
 threshold_sweep:
   - 0.80
@@ -22,6 +34,7 @@ threshold_sweep:
   - 0.99
 
 notes:
-  - Candidate thresholds are for offline calibration only.
-  - The 240-row museum sample is stratified around baseline failure modes and does not represent production prevalence.
-  - Production thresholds must be frozen only after adjudication and representative holdout validation.
+  - Production routing remains disabled.
+  - Phase 4 found probable public-label and ontology mismatches.
+  - The 0.98 threshold is a conservative holdout candidate, not a production SLA.
+  - Final thresholds require independent human adjudication and explicit false-positive/false-negative business costs.

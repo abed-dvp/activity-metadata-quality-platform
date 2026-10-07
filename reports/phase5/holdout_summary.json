@@ -1,0 +1,58 @@
+{
+  "phase": "phase5_representative_holdout",
+  "category": "museum",
+  "model": "gemini-3.8-flash",
+  "provider": "google_gemini_generate_content",
+  "prompt_version": "category_membership_v1",
+  "holdout_design": {
+    "category": "museum",
+    "source_rows": 2264,
+    "calibration_excluded_entities": 240,
+    "residual_rows": 2024,
+    "residual_positive_rows": 31,
+    "residual_prevalence": 0.015316205533596838,
+    "representative_rows": 600,
+    "representative_positive_rows": 8,
+    "representative_prevalence": 0.013333333333333334,
+    "union_rows_to_evaluate": 623,
+    "positive_diagnostic_rows": 31,
+    "seed": 20261007
+  },
+  "representative_metrics": {
+    "rows": 600,
+    "decided_rows": 572,
+    "coverage": 0.9533333333333334,
+    "abstention_rate": 0.04666666666666667,
+    "decided_only": {
+      "true_positive": 8,
+      "false_positive": 9,
+      "false_negative": 0,
+      "true_negative": 555,
+      "precision": 0.47058823529411764,
+      "recall": 1.0,
+      "f1": 0.6399999999999999
+    },
+    "conservative": {
+      "true_positive": 8,
+      "false_positive": 9,
+      "false_negative": 0,
+      "true_negative": 583,
+      "precision": 0.47058823529411764,
+      "recall": 1.0,
+      "f1": 0.6399999999999999
+    }
+  },
+  "positive_diagnostic": {
+    "rows": 31,
+    "member": 28,
+    "not_member": 2,
+    "uncertain": 1,
+    "member_rate": 0.9032258064516129,
+    "member_or_uncertain_rate": 0.9354838709677419
+  },
+  "input_tokens": 335791,
+  "output_tokens_including_thinking": 62106,
+  "estimated_standard_cost_usd_oct_2026": 0.48474075000000005,
+  "provider_error_rows": 1,
+  "important_caveat": "Public annotations remain the evaluation reference for holdout metrics, but Phase 4 showed likely annotation/ontology mismatches. These metrics are therefore validation against the public-label reference, not final human gold."
+}
