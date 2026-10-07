@@ -49,6 +49,25 @@ def test_category_evaluation_join():
     assert set(evaluation["category"]) == {"museum", "park"}
 
 
+def test_category_evaluation_excludes_invalid_identity_rows():
+    raw = sample_raw_catalog()
+    raw.loc[len(raw)] = [3, None, "attraction", None, 51.5, -0.1, None, None]
+    catalog = prepare_catalog(raw)
+    annotated = pd.DataFrame(
+        {
+            "POI Name": ["British Museum", "Hyde Park", None],
+            "Address": ["Great Russell Street", "London", None],
+            "Museum": [1, None, 1],
+            "Park": [None, 1, None],
+        }
+    )
+    evaluation = build_evaluation_dataset(catalog, annotated)
+    assert evaluation["entity_id"].notna().all()
+    assert evaluation["name"].notna().all()
+    assert evaluation["address"].notna().all()
+    assert len(evaluation) == 4
+
+
 def test_deterministic_quality_checks():
     catalog = prepare_catalog(sample_raw_catalog())
     catalog.loc[0, "latitude"] = 200
@@ -65,6 +84,7 @@ def test_binary_metrics():
     assert result.precision == 0.5
     assert result.recall == 0.5
     assert result.f1 == 0.5
+
 
 from src.data.profile_london import profile_dataset
 from src.evaluation.category_report import evaluate_predictions
@@ -84,7 +104,10 @@ def test_profile_dataset_reports_join_coverage_and_categories():
     assert profile["catalog_rows"] == 2
     assert profile["annotation_rows"] == 2
     assert profile["annotation_category_count"] == 2
-    assert profile["join_coverage_vs_annotations"] == 1.0
+    assert profile["join_coverage_vs_all_annotations"] == 1.0
+    assert profile["join_coverage_vs_valid_annotations"] == 1.0
+    assert profile["catalog_invalid_identity_rows"] == 0
+    assert profile["annotation_invalid_identity_rows"] == 0
     assert profile["positive_labels_by_category"]["museum"] == 1
 
 
