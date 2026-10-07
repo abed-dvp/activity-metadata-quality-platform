@@ -67,7 +67,7 @@ data/processed/phase2_summary.json
 
 The real London baseline shows that lexical matching is insufficient: micro precision is about 56% while micro recall is about 3.5%. See `docs/phase-2-real-results.md`.
 
-## Phase 3 — Atomic semantic category evaluator
+## Phase 3 — Atomic semantic category evaluator with Gemini
 
 The first semantic vertical is `museum`. It was selected because the deterministic baseline has both false negatives and adjacent-category false positives such as galleries.
 
@@ -84,17 +84,19 @@ The evaluator processes **one entity × one category** and returns a strict stru
 
 Ground-truth labels and deterministic predictions are never sent to the model. They are merged back only after inference for evaluation.
 
+The semantic provider uses the **Google Gemini Interactions API** with JSON Schema structured output.
+
 Run locally after Phase 1 and Phase 2:
 
 ```bash
-export OPENAI_API_KEY="..."
+export GEMINI_API_KEY="..."
 python -m src.semantic.run_phase3 \
   --category museum \
   --sample-size 240 \
-  --model gpt-5.6-luna
+  --model gemini-3.8-flash
 ```
 
-Or use the manual **Semantic category calibration** GitHub Actions workflow after adding `OPENAI_API_KEY` as a repository Actions secret.
+Or use the manual **Semantic category calibration** GitHub Actions workflow after adding `GEMINI_API_KEY` as a repository Actions secret.
 
 Phase 3 reports deterministic-vs-semantic precision/recall/F1 on the same calibration set, coverage, abstention rate, token usage and disagreement cases. See `docs/phase-3-semantic-evaluator.md`.
 

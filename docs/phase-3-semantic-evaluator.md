@@ -50,7 +50,7 @@ Each evaluation returns exactly:
 }
 ```
 
-The contract is enforced with Structured Outputs / JSON Schema and revalidated in application code.
+The contract is enforced with Gemini structured output using JSON Schema and revalidated in application code.
 
 `uncertain` is a first-class outcome. It is measured as abstention/coverage instead of silently converting every ambiguous case into a confident label.
 
@@ -101,22 +101,27 @@ A semantic evaluator is not considered production-ready merely because F1 improv
 
 ## Provider design
 
-The first provider uses the OpenAI Responses API with strict structured output. Provider access is isolated behind an interface so another provider can be added without changing the evaluation dataset or metric layer.
+The semantic provider uses the **Google Gemini Interactions API**. The request supplies a JSON Schema response format so the model must return the category decision contract rather than free-form text.
 
-The model is configuration, not business logic. The default calibration model is `gpt-5.6-luna`, but the workflow accepts a model input and records the selected model in every result.
+Provider access remains isolated behind an interface, so the evaluation dataset, ontology and metric layer do not depend on Gemini-specific code.
 
-No API credential is stored in source control. GitHub Actions reads `OPENAI_API_KEY` from repository secrets.
+The default calibration model is `gemini-3.8-flash`. The workflow accepts a model input and records the selected model in every result.
+
+No API credential is stored in source control. GitHub Actions reads `GEMINI_API_KEY` from repository secrets.
 
 ## Run locally
 
 After Phase 1 and Phase 2:
 
 ```bash
-export OPENAI_API_KEY="..."
-python -m src.semantic.run_phase3   --category museum   --sample-size 240   --model gpt-5.6-luna
+export GEMINI_API_KEY="..."
+python -m src.semantic.run_phase3 \
+  --category museum \
+  --sample-size 240 \
+  --model gemini-3.8-flash
 ```
 
-On GitHub, use the **Semantic category calibration** workflow after adding the `OPENAI_API_KEY` Actions secret.
+On GitHub, use the **Semantic category calibration** workflow after adding the `GEMINI_API_KEY` Actions secret.
 
 ## What remains out of scope in this phase
 
@@ -133,7 +138,7 @@ Those are deferred until the first semantic evaluator is calibrated and its fail
 
 ## Next decision gate
 
-After the first real `museum` semantic run, inspect:
+After the first real `museum` Gemini semantic run, inspect:
 
 1. precision improvement vs deterministic baseline;
 2. recall improvement;

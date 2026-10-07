@@ -14,9 +14,9 @@ on:
         default: "240"
         type: string
       model:
-        description: OpenAI model
+        description: Google Gemini model
         required: true
-        default: gpt-5.6-luna
+        default: gemini-3.8-flash
         type: string
 
 permissions:
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
     steps:
       - name: Checkout
@@ -45,10 +45,10 @@ jobs:
       - name: Run unit tests
         run: pytest -q
 
-      - name: Check API credential
+      - name: Check Gemini API credential
         run: |
-          if [ -z "$OPENAI_API_KEY" ]; then
-            echo "OPENAI_API_KEY GitHub Actions secret is required for semantic calibration."
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "GEMINI_API_KEY GitHub Actions secret is required for semantic calibration."
             exit 1
           fi
 
@@ -60,9 +60,12 @@ jobs:
           python -m src.data.run_phase1
           python -m src.evaluation.run_phase2
 
-      - name: Run atomic semantic evaluator
+      - name: Run atomic Gemini semantic evaluator
         run: |
-          python -m src.semantic.run_phase3             --category "${{ inputs.category }}"             --sample-size "${{ inputs.sample_size }}"             --model "${{ inputs.model }}"
+          python -m src.semantic.run_phase3 \
+            --category "${{ inputs.category }}" \
+            --sample-size "${{ inputs.sample_size }}" \
+            --model "${{ inputs.model }}"
 
       - name: Prepare report
         run: |
@@ -87,6 +90,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No report changes to commit."
           else
-            git commit -m "eval: add semantic ${{ inputs.category }} calibration results"
+            git commit -m "eval: add Gemini semantic ${{ inputs.category }} calibration results"
             git push
           fi

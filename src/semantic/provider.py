@@ -27,25 +27,52 @@ class SemanticProvider(Protocol):
 def _extract_output_text(payload: dict[str, Any]) -> str:
     if isinstance(payload.get("output_text"), str):
         return payload["output_text"]
-    for item in payload.get("output", []):
-        if item.get("type") != "message":
+
+    for step in payload.get("steps", []):
+        if step.get("type") != "model_output":
             continue
-        for content in item.get("content", []):
-            if content.get("type") == "output_text" and isinstance(content.get("text"), str):
+        for content in step.get("content", []):
+            if content.get("type") == "text" and isinstance(content.get("text"), str):
                 return content["text"]
-    raise ValueError("Responses API payload did not contain output text")
+
+    for output in payload.get("output", []):
+        for content in output.get("content", []):
+            if isinstance(content.get("text"), str):
+                return content["text"]
+
+    raise ValueError("Gemini Interactions API payload did not contain output text")
 
 
-class OpenAIResponsesProvider:
+def _usage_tokens(payload: dict[str, Any]) -> tuple[int | None, int | None]:
+    usage = (
+        payload.get("usage")
+        or payload.get("usage_metadata")
+        or payload.get("usageMetadata")
+        or {}
+    )
+    input_tokens = (
+        usage.get("input_tokens")
+        or usage.get("inputTokenCount")
+        or usage.get("promptTokenCount")
+    )
+    output_tokens = (
+        usage.get("output_tokens")
+        or usage.get("outputTokenCount")
+        or usage.get("candidatesTokenCount")
+    )
+    return input_tokens, output_tokens
+
+
+class GeminiInteractionsProvider:
     def __init__(
         self,
         api_key: str,
-        model: str = "gpt-5.6-luna",
+        model: str = "gemini-3.8-flash",
         timeout_seconds: int = 90,
         max_retries: int = 3,
     ) -> None:
         if not api_key:
-            raise ValueError("OPENAI_API_KEY is required")
+            raise ValueError("GEMINI_API_KEY is required")
         self.api_key = api_key
         self.model = model
         self.timeout_seconds = timeout_seconds
@@ -54,26 +81,26 @@ class OpenAIResponsesProvider:
     def evaluate(self, system_prompt: str, user_prompt: str) -> ProviderResult:
         body = {
             "model": self.model,
-            "input": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "text": {
-                "format": {
-                    "type": "json_schema",
-                    "name": "category_membership_decision",
-                    "schema": decision_json_schema(),
-                    "strict": True,
-                }
+            "input": (
+                "SYSTEM INSTRUCTIONS:\n"
+                f"{system_prompt}\n\n"
+                "USER TASK:\n"
+                f"{user_prompt}"
+            ),
+            "response_format": {
+                "type": "text",
+                "mime_type": "application/json",
+                "schema": decision_json_schema(),
             },
         }
+
         last_error: Exception | None = None
         for attempt in range(self.max_retries):
             try:
                 response = requests.post(
-                    "https://api.openai.com/v1/responses",
+                    "https://generativelanguage.googleapis.com/v1beta/interactions",
                     headers={
-                        "Authorization": f"Bearer {self.api_key}",
+                        "x-goog-api-key": self.api_key,
                         "Content-Type": "application/json",
                     },
                     json=body,
@@ -81,21 +108,24 @@ class OpenAIResponsesProvider:
                 )
                 if response.status_code == 429 or response.status_code >= 500:
                     raise requests.HTTPError(
-                        f"retryable OpenAI response {response.status_code}: {response.text[:500]}"
+                        f"retryable Gemini response {response.status_code}: {response.text[:500]}"
                     )
                 response.raise_for_status()
                 payload = response.json()
                 decision = parse_semantic_decision(_extract_output_text(payload))
-                usage = payload.get("usage") or {}
+                input_tokens, output_tokens = _usage_tokens(payload)
                 return ProviderResult(
                     decision=decision,
                     response_id=payload.get("id"),
-                    input_tokens=usage.get("input_tokens"),
-                    output_tokens=usage.get("output_tokens"),
+                    input_tokens=input_tokens,
+                    output_tokens=output_tokens,
                 )
             except (requests.RequestException, ValueError, json.JSONDecodeError) as exc:
                 last_error = exc
                 if attempt == self.max_retries - 1:
                     break
                 time.sleep(2**attempt)
-        raise RuntimeError(f"Semantic provider failed after {self.max_retries} attempts: {last_error}")
+
+        raise RuntimeError(
+            f"Gemini semantic provider failed after {self.max_retries} attempts: {last_error}"
+        )

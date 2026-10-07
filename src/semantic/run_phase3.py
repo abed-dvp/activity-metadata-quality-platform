@@ -11,7 +11,7 @@ import pandas as pd
 
 from src.evaluation.semantic_report import evaluate_semantic_sample
 from src.semantic.prompt import PROMPT_VERSION, build_category_prompt, load_ontology
-from src.semantic.provider import OpenAIResponsesProvider, SemanticProvider
+from src.semantic.provider import GeminiInteractionsProvider, SemanticProvider
 from src.semantic.sample import build_calibration_sample
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -70,6 +70,7 @@ def run_semantic_evaluation(
             "category": category,
             "sample_size": int(len(merged)),
             "model": provider.model,
+            "provider": "google_gemini_interactions",
             "prompt_version": PROMPT_VERSION,
             "input_tokens": int(pd.to_numeric(merged["input_tokens"], errors="coerce").fillna(0).sum()),
             "output_tokens": int(pd.to_numeric(merged["output_tokens"], errors="coerce").fillna(0).sum()),
@@ -82,7 +83,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run Phase 3 atomic semantic category evaluation.")
     parser.add_argument("--category", default="museum")
     parser.add_argument("--sample-size", type=int, default=240)
-    parser.add_argument("--model", default=os.getenv("OPENAI_MODEL", "gpt-5.6-luna"))
+    parser.add_argument("--model", default=os.getenv("GEMINI_MODEL", "gemini-3.8-flash"))
     parser.add_argument("--max-workers", type=int, default=5)
     parser.add_argument("--input", type=Path, default=PROCESSED / "category_predictions.csv")
     args = parser.parse_args()
@@ -91,14 +92,15 @@ def main() -> None:
         raise FileNotFoundError(
             f"Missing {args.input}. Run Phase 1 and Phase 2 first."
         )
-    api_key = os.getenv("OPENAI_API_KEY", "").strip()
+
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError(
-            "OPENAI_API_KEY is not set. Add it as a local environment variable or GitHub Actions secret."
+            "GEMINI_API_KEY is not set. Add it as a local environment variable or GitHub Actions secret."
         )
 
     predictions = pd.read_csv(args.input)
-    provider = OpenAIResponsesProvider(api_key=api_key, model=args.model)
+    provider = GeminiInteractionsProvider(api_key=api_key, model=args.model)
     evaluated, summary = run_semantic_evaluation(
         predictions=predictions,
         provider=provider,
