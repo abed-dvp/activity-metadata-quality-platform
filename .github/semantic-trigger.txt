@@ -1,1 +1,1 @@
-Trigger Gemini museum calibration after SDK transport fix: 2026-10-07T21:06:00+02:00
+run full 240-case Gemini museum calibration
