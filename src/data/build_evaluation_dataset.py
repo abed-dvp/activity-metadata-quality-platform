@@ -22,22 +22,41 @@ def _key(series: pd.Series) -> pd.Series:
     )
 
 
+def _deduplicate_catalog(catalog: pd.DataFrame) -> pd.DataFrame:
+    out = catalog.copy()
+    out["_name_key"] = _key(out["name"])
+    out["_address_key"] = _key(out["address"])
+    return (
+        out.sort_values("entity_id")
+        .drop_duplicates(["_name_key", "_address_key"], keep="first")
+        .reset_index(drop=True)
+    )
+
+
+def _aggregate_annotations(labels: pd.DataFrame, name_col: str, address_col: str, category_cols: list[str]) -> pd.DataFrame:
+    out = labels.copy()
+    out["_name_key"] = _key(out[name_col])
+    out["_address_key"] = _key(out[address_col])
+
+    for category in category_cols:
+        out[category] = pd.to_numeric(out[category], errors="coerce").fillna(0).astype(int)
+
+    return (
+        out.groupby(["_name_key", "_address_key"], as_index=False)[category_cols]
+        .max()
+    )
+
+
 def build_evaluation_dataset(catalog: pd.DataFrame, annotated: pd.DataFrame) -> pd.DataFrame:
     labels = normalize_columns(annotated)
     name_col, address_col = detect_identity_columns(labels)
     category_cols = [c for c in labels.columns if c not in {name_col, address_col}]
 
-    for category in category_cols:
-        labels[category] = pd.to_numeric(labels[category], errors="coerce").fillna(0).astype(int)
+    catalog_unique = _deduplicate_catalog(catalog)
+    labels_unique = _aggregate_annotations(labels, name_col, address_col, category_cols)
 
-    catalog = catalog.copy()
-    catalog["_name_key"] = _key(catalog["name"])
-    catalog["_address_key"] = _key(catalog["address"])
-    labels["_name_key"] = _key(labels[name_col])
-    labels["_address_key"] = _key(labels[address_col])
-
-    merged = catalog.merge(
-        labels[["_name_key", "_address_key", *category_cols]],
+    merged = catalog_unique.merge(
+        labels_unique,
         on=["_name_key", "_address_key"],
         how="inner",
         validate="one_to_one",
@@ -60,7 +79,7 @@ def build_evaluation_dataset(catalog: pd.DataFrame, annotated: pd.DataFrame) -> 
     long["is_member"] = long["is_member"].astype(int)
     long["label_source"] = "human_annotation"
     long["evaluation_dataset_version"] = "london_category_eval_v1"
-    return long.drop(columns=[], errors="ignore")
+    return long
 
 
 def main(catalog_path: Path, annotations_path: Path, output_path: Path) -> None:
