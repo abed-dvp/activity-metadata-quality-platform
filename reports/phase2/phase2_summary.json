@@ -1,0 +1,16 @@
+{
+  "baseline": "deterministic_keyword_v1",
+  "threshold": 2.0,
+  "rows": 28032,
+  "entities": 2335,
+  "categories": 12,
+  "gold_positives": 4328,
+  "predicted_positives": 261,
+  "failures": 4295,
+  "micro_precision": 0.5632183908045977,
+  "micro_recall": 0.03396487985212569,
+  "micro_f1": 0.06406624536936151,
+  "macro_precision": 0.48454744397759103,
+  "macro_recall": 0.08039568701036459,
+  "macro_f1": 0.08193208978224444
+}
