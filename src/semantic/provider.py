@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import json
 import time
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Protocol
 
-import requests
+from google import genai
 
 from src.semantic.contracts import SemanticDecision, decision_json_schema, parse_semantic_decision
 
@@ -24,43 +23,35 @@ class SemanticProvider(Protocol):
     def evaluate(self, system_prompt: str, user_prompt: str) -> ProviderResult: ...
 
 
-def _extract_output_text(payload: dict[str, Any]) -> str:
-    if isinstance(payload.get("output_text"), str):
-        return payload["output_text"]
-
-    for step in payload.get("steps", []):
-        if step.get("type") != "model_output":
-            continue
-        for content in step.get("content", []):
-            if content.get("type") == "text" and isinstance(content.get("text"), str):
-                return content["text"]
-
-    for output in payload.get("output", []):
-        for content in output.get("content", []):
-            if isinstance(content.get("text"), str):
-                return content["text"]
-
-    raise ValueError("Gemini Interactions API payload did not contain output text")
+def _safe_int(value) -> int | None:
+    try:
+        return int(value) if value is not None else None
+    except (TypeError, ValueError):
+        return None
 
 
-def _usage_tokens(payload: dict[str, Any]) -> tuple[int | None, int | None]:
+def _usage_tokens(interaction) -> tuple[int | None, int | None]:
     usage = (
-        payload.get("usage")
-        or payload.get("usage_metadata")
-        or payload.get("usageMetadata")
-        or {}
+        getattr(interaction, "usage", None)
+        or getattr(interaction, "usage_metadata", None)
+        or getattr(interaction, "usageMetadata", None)
     )
-    input_tokens = (
-        usage.get("input_tokens")
-        or usage.get("inputTokenCount")
-        or usage.get("promptTokenCount")
+    if usage is None:
+        return None, None
+
+    def read(*names):
+        for name in names:
+            value = getattr(usage, name, None)
+            if value is not None:
+                return value
+            if isinstance(usage, dict) and name in usage:
+                return usage[name]
+        return None
+
+    return (
+        _safe_int(read("input_tokens", "input_token_count", "prompt_token_count", "promptTokenCount")),
+        _safe_int(read("output_tokens", "output_token_count", "candidates_token_count", "candidatesTokenCount")),
     )
-    output_tokens = (
-        usage.get("output_tokens")
-        or usage.get("outputTokenCount")
-        or usage.get("candidatesTokenCount")
-    )
-    return input_tokens, output_tokens
 
 
 class GeminiInteractionsProvider:
@@ -68,64 +59,49 @@ class GeminiInteractionsProvider:
         self,
         api_key: str,
         model: str = "gemini-3.8-flash",
-        timeout_seconds: int = 90,
         max_retries: int = 3,
     ) -> None:
         if not api_key:
             raise ValueError("GEMINI_API_KEY is required")
         self.api_key = api_key
         self.model = model
-        self.timeout_seconds = timeout_seconds
         self.max_retries = max_retries
+        self.client = genai.Client(api_key=api_key)
 
     def evaluate(self, system_prompt: str, user_prompt: str) -> ProviderResult:
-        body = {
-            "model": self.model,
-            "input": (
-                "SYSTEM INSTRUCTIONS:\n"
-                f"{system_prompt}\n\n"
-                "USER TASK:\n"
-                f"{user_prompt}"
-            ),
-            "response_format": {
-                "type": "text",
-                "mime_type": "application/json",
-                "schema": decision_json_schema(),
-            },
-        }
-
         last_error: Exception | None = None
+
         for attempt in range(self.max_retries):
             try:
-                response = requests.post(
-                    "https://generativelanguage.googleapis.com/v1beta/interactions",
-                    headers={
-                        "x-goog-api-key": self.api_key,
-                        "Content-Type": "application/json",
+                interaction = self.client.interactions.create(
+                    model=self.model,
+                    system_instruction=system_prompt,
+                    input=user_prompt,
+                    response_format={
+                        "type": "text",
+                        "mime_type": "application/json",
+                        "schema": decision_json_schema(),
                     },
-                    json=body,
-                    timeout=self.timeout_seconds,
                 )
-                if response.status_code == 429 or response.status_code >= 500:
-                    raise requests.HTTPError(
-                        f"retryable Gemini response {response.status_code}: {response.text[:500]}"
-                    )
-                response.raise_for_status()
-                payload = response.json()
-                decision = parse_semantic_decision(_extract_output_text(payload))
-                input_tokens, output_tokens = _usage_tokens(payload)
+                raw = interaction.output_text
+                if not raw:
+                    raise ValueError("Gemini returned an empty output_text")
+
+                decision = parse_semantic_decision(raw)
+                input_tokens, output_tokens = _usage_tokens(interaction)
                 return ProviderResult(
                     decision=decision,
-                    response_id=payload.get("id"),
+                    response_id=getattr(interaction, "id", None),
                     input_tokens=input_tokens,
                     output_tokens=output_tokens,
                 )
-            except (requests.RequestException, ValueError, json.JSONDecodeError) as exc:
+            except Exception as exc:
                 last_error = exc
                 if attempt == self.max_retries - 1:
                     break
                 time.sleep(2**attempt)
 
         raise RuntimeError(
-            f"Gemini semantic provider failed after {self.max_retries} attempts: {last_error}"
+            f"Gemini semantic provider failed after {self.max_retries} attempts: "
+            f"{type(last_error).__name__}: {last_error}"
         )

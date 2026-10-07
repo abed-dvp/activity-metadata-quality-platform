@@ -5,7 +5,7 @@ import pandas as pd
 from src.evaluation.semantic_report import evaluate_semantic_sample
 from src.semantic.contracts import parse_semantic_decision
 from src.semantic.prompt import build_category_prompt
-from src.semantic.provider import _extract_output_text, _usage_tokens
+from src.semantic.provider import _usage_tokens
 from src.semantic.sample import build_calibration_sample
 
 
@@ -82,29 +82,11 @@ def test_semantic_report_tracks_coverage_and_abstention():
     assert report["semantic_decided_only"]["precision"] == 1.0
 
 
-def test_gemini_output_extraction_from_interactions_payload():
-    payload = {
-        "id": "abc",
-        "steps": [
-            {
-                "type": "model_output",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": "{\"decision\":\"member\",\"confidence\":0.9,\"reason_codes\":[\"ENTITY_TYPE_MATCH\"],\"evidence\":\"Named museum\"}",
-                    }
-                ],
-            }
-        ],
-    }
-    assert _extract_output_text(payload).startswith('{"decision":"member"')
-
-
-def test_gemini_usage_parsing_supports_common_fields():
-    payload = {
-        "usageMetadata": {
+def test_gemini_usage_parsing_from_dict_like_payload():
+    class Interaction:
+        usage = {
             "promptTokenCount": 100,
             "candidatesTokenCount": 25,
         }
-    }
-    assert _usage_tokens(payload) == (100, 25)
+
+    assert _usage_tokens(Interaction()) == (100, 25)
