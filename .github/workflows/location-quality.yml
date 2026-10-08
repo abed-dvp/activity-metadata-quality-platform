@@ -1,0 +1,74 @@
+name: Location quality baseline
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/location-quality.yml"
+      - "src/quality/location.py"
+      - "src/evaluation/run_location_baseline.py"
+      - "tests/test_location_quality.py"
+      - ".github/location-trigger.txt"
+
+permissions:
+  contents: write
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install project
+        run: pip install -e ".[dev]"
+
+      - name: Run unit tests
+        run: pytest -q
+
+      - name: Download London data
+        run: python -m src.data.download_london
+
+      - name: Build canonical catalog
+        run: python -m src.data.run_phase1
+
+      - name: Run location baseline
+        run: python -m src.evaluation.run_location_baseline
+
+      - name: Prepare compact reports
+        run: |
+          mkdir -p reports/location
+          cp data/processed/location_summary.json reports/location/
+          cp data/processed/location_findings.csv reports/location/
+
+      - name: Upload full location outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: london-location-quality
+          path: |
+            data/processed/location_summary.json
+            data/processed/location_findings.csv
+          retention-days: 30
+
+      - name: Commit compact location reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/location
+          if git diff --cached --quiet; then
+            echo "No location report changes."
+          else
+            git commit -m "eval: add London location quality baseline"
+            git fetch origin main
+            git rebase origin/main
+            git push
+          fi
