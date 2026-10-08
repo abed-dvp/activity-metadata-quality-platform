@@ -1,0 +1,16 @@
+{
+  "catalog_rows": 2341,
+  "complete_coordinate_pairs": 2336,
+  "coordinate_pair_coverage": 0.9978641606151217,
+  "entities_with_location_findings": 1,
+  "entity_finding_rate": 0.00042716787697565144,
+  "findings": 5,
+  "findings_by_defect_type": {
+    "MISSING_COORDINATES": 5
+  },
+  "findings_by_severity": {
+    "medium": 5
+  },
+  "production_routing_enabled": false,
+  "interpretation": "Deterministic London-specific plausibility baseline only. Address-to-coordinate semantic consistency is not yet validated."
+}

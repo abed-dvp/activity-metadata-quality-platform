@@ -1,0 +1,6 @@
+entity_id,quality_domain,defect_type,field_name,severity,evidence
+nan,location,MISSING_COORDINATES,"latitude,longitude",medium,Both latitude and longitude are missing.
+nan,location,MISSING_COORDINATES,"latitude,longitude",medium,Both latitude and longitude are missing.
+nan,location,MISSING_COORDINATES,"latitude,longitude",medium,Both latitude and longitude are missing.
+nan,location,MISSING_COORDINATES,"latitude,longitude",medium,Both latitude and longitude are missing.
+nan,location,MISSING_COORDINATES,"latitude,longitude",medium,Both latitude and longitude are missing.
