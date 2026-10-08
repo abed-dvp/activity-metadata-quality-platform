@@ -28,6 +28,15 @@ LONDON_PLAUSIBILITY_BOUNDS = GeoBounds(
 )
 
 
+def _valid_entity_mask(series: pd.Series) -> pd.Series:
+    values = series.astype("string")
+    return values.notna() & values.str.strip().ne("")
+
+
+def _eligible_catalog(catalog: pd.DataFrame) -> pd.DataFrame:
+    return catalog.loc[_valid_entity_mask(catalog["entity_id"])].copy()
+
+
 def _finding(
     entity_id: object,
     defect_type: str,
@@ -49,19 +58,17 @@ def validate_location_quality(
     catalog: pd.DataFrame,
     bounds: GeoBounds = LONDON_PLAUSIBILITY_BOUNDS,
 ) -> pd.DataFrame:
-    """Return one row per deterministic location-quality finding.
+    """Return deterministic location findings for rows with valid entity identity.
 
-    The checks are intentionally conservative and source-aware. They verify whether
-    coordinates are usable and geographically plausible for this London dataset;
-    they do not claim that an address and coordinate refer to the same entrance or
-    bookable meeting point.
+    Identity-invalid rows belong to the schema-quality domain and are deliberately
+    excluded here so one source defect is not double-counted as a location defect.
     """
     required = {"entity_id", "latitude", "longitude"}
     missing_columns = required - set(catalog.columns)
     if missing_columns:
         raise ValueError(f"Missing required location columns: {sorted(missing_columns)}")
 
-    df = catalog.copy()
+    df = _eligible_catalog(catalog)
     lat = pd.to_numeric(df["latitude"], errors="coerce")
     lon = pd.to_numeric(df["longitude"], errors="coerce")
 
@@ -154,17 +161,23 @@ def validate_location_quality(
 
 def summarize_location_quality(catalog: pd.DataFrame, findings: pd.DataFrame) -> dict:
     rows = int(len(catalog))
+    eligible = _eligible_catalog(catalog)
+    eligible_rows = int(len(eligible))
+    excluded_invalid_identity_rows = rows - eligible_rows
+
     entities_with_findings = int(findings["entity_id"].nunique()) if len(findings) else 0
-    lat = pd.to_numeric(catalog["latitude"], errors="coerce")
-    lon = pd.to_numeric(catalog["longitude"], errors="coerce")
+    lat = pd.to_numeric(eligible["latitude"], errors="coerce")
+    lon = pd.to_numeric(eligible["longitude"], errors="coerce")
     complete_pairs = int((lat.notna() & lon.notna()).sum())
 
     return {
         "catalog_rows": rows,
+        "location_eligible_rows": eligible_rows,
+        "excluded_invalid_identity_rows": excluded_invalid_identity_rows,
         "complete_coordinate_pairs": complete_pairs,
-        "coordinate_pair_coverage": complete_pairs / rows if rows else 0.0,
+        "coordinate_pair_coverage": complete_pairs / eligible_rows if eligible_rows else 0.0,
         "entities_with_location_findings": entities_with_findings,
-        "entity_finding_rate": entities_with_findings / rows if rows else 0.0,
+        "entity_finding_rate": entities_with_findings / eligible_rows if eligible_rows else 0.0,
         "findings": int(len(findings)),
         "findings_by_defect_type": (
             findings["defect_type"].value_counts().sort_index().to_dict()
@@ -178,7 +191,7 @@ def summarize_location_quality(catalog: pd.DataFrame, findings: pd.DataFrame) ->
         ),
         "production_routing_enabled": False,
         "interpretation": (
-            "Deterministic London-specific plausibility baseline only. "
+            "Deterministic London-specific plausibility baseline on identity-valid entities only. "
             "Address-to-coordinate semantic consistency is not yet validated."
         ),
     }
