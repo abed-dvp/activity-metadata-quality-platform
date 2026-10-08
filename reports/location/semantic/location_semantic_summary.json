@@ -1,0 +1,25 @@
+{
+  "phase": "location_address_coordinate_consistency",
+  "sample_size": 30,
+  "seed": 20261008,
+  "resolved_rows": 27,
+  "resolution_rate": 0.9,
+  "decision_counts": {
+    "consistent": 18,
+    "suspicious": 7,
+    "uncertain": 2,
+    "unresolved": 3
+  },
+  "median_distance_m": 85.0,
+  "p90_distance_m": 11935.1,
+  "max_distance_m": 26915.4,
+  "thresholds_m": {
+    "consistent_max": 500,
+    "uncertain_max": 1500,
+    "suspicious_min_exclusive": 1500
+  },
+  "reference_provider": "OpenStreetMap Nominatim public API",
+  "provider_usage_mode": "one-time small diagnostic sample; single-thread; >=1.1s between requests",
+  "production_routing_enabled": false,
+  "interpretation": "External geocoding is diagnostic evidence only. Distance can reflect address centroids, entrance choice, or geocoder ambiguity, so suspicious cases require review."
+}
