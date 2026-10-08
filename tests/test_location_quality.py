@@ -23,6 +23,25 @@ def test_location_quality_flags_missing_partial_invalid_and_outside_bounds():
     assert "ok" not in set(findings["entity_id"])
 
 
+def test_location_quality_excludes_identity_invalid_rows():
+    catalog = pd.DataFrame(
+        {
+            "entity_id": ["ok", None, ""],
+            "latitude": [51.50, None, None],
+            "longitude": [-0.12, None, None],
+        }
+    )
+
+    findings = validate_location_quality(catalog)
+    summary = summarize_location_quality(catalog, findings)
+
+    assert findings.empty
+    assert summary["catalog_rows"] == 3
+    assert summary["location_eligible_rows"] == 1
+    assert summary["excluded_invalid_identity_rows"] == 2
+    assert summary["coordinate_pair_coverage"] == 1.0
+
+
 def test_location_summary_reports_entity_rate_not_only_issue_count():
     catalog = pd.DataFrame(
         {
@@ -35,6 +54,7 @@ def test_location_summary_reports_entity_rate_not_only_issue_count():
     summary = summarize_location_quality(catalog, findings)
 
     assert summary["catalog_rows"] == 2
+    assert summary["location_eligible_rows"] == 2
     assert summary["complete_coordinate_pairs"] == 1
     assert summary["coordinate_pair_coverage"] == 0.5
     assert summary["entities_with_location_findings"] == 1
