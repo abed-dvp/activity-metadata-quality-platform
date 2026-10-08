@@ -1,1 +1,1 @@
-location-baseline-v1
+location-baseline-v2
