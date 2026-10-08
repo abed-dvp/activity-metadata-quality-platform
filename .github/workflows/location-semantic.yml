@@ -1,0 +1,37 @@
+name: Location semantic diagnostic
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/location-semantic-trigger.txt'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -e ".[dev]"
+      - run: pytest -q
+      - run: python -m src.data.download_london
+      - run: python -m src.data.run_phase1
+      - run: python -m src.evaluation.run_location_semantic --sample-size 30 --seed 20261008
+      - name: Commit diagnostic results
+        run: |
+          mkdir -p reports/location/semantic
+          cp data/processed/location_semantic_summary.json reports/location/semantic/
+          cp data/processed/location_semantic_results.csv reports/location/semantic/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/location/semantic
+          if ! git diff --cached --quiet; then
+            git commit -m "eval: cache address-coordinate diagnostic"
+            git fetch origin main
+            git rebase origin/main
+            git push
+          fi
