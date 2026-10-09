@@ -1,0 +1,17 @@
+{
+  "review_rows": 12,
+  "by_decision": {
+    "suspicious": 7,
+    "uncertain": 2,
+    "unresolved": 3
+  },
+  "by_root_cause": {
+    "address_coordinate_mismatch_candidate": 2,
+    "boundary_or_geocoder_ambiguity": 2,
+    "geocoder_unresolved": 3,
+    "underspecified_address": 5
+  },
+  "priority_1_mismatch_candidates": 2,
+  "automatic_correction_enabled": false,
+  "decision": "Location anomalies are routed to human review with address specificity separated from coordinate-mismatch evidence. No coordinate is automatically overwritten."
+}
