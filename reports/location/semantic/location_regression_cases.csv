@@ -1,0 +1,3 @@
+entity_id,name,expected_root_cause,expected_pin_action,expected_address_action
+london_poi_42079.0,Acorn 20/20,ADDRESS_CONTEXT_INCOMPLETE,KEEP_OR_REVIEW_PIN,ENRICH_ADDRESS
+london_poi_63724.0,The Corrib Rest,ADDRESS_STREET_NAME_TYPO,KEEP_PIN,CORRECT_ADDRESS
