@@ -1,0 +1,12 @@
+{
+  "adjudicated_cases": 2,
+  "true_coordinate_mismatch_confirmed": 0,
+  "address_quality_defects_confirmed": 2,
+  "root_causes": {
+    "ADDRESS_CONTEXT_INCOMPLETE": 1,
+    "ADDRESS_STREET_NAME_TYPO": 1
+  },
+  "key_finding": "Both Priority-1 geocoding anomalies were caused by address-quality problems rather than confirmed bad coordinates.",
+  "policy_update": "Do not treat large geocoder distance as a coordinate defect until address completeness, spelling, and entity context have been checked.",
+  "automatic_coordinate_overwrite_enabled": false
+}
