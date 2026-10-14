@@ -1,0 +1,26 @@
+{
+  "rows": 30,
+  "actions": {
+    "HUMAN_REVIEW": 15,
+    "NEED_MORE_EVIDENCE": 11,
+    "PASS": 4
+  },
+  "action_lanes": {
+    "CATEGORY": 3,
+    "COVERAGE": 11,
+    "EVIDENCE_GAP": 6,
+    "LOCATION_EVIDENCE": 2,
+    "NONE": 4,
+    "SUPPLIER_CONTENT": 4
+  },
+  "internal_auto_flags": 11,
+  "full_rows_pass": 4,
+  "full_rows_human_review": 9,
+  "partial_rows_need_more_evidence": 11,
+  "partial_rows_human_review": 6,
+  "supplier_fix_request_candidates_after_confirmation": 4,
+  "supplier_contact_enabled": false,
+  "metadata_mutation_enabled": false,
+  "production_enabled": false,
+  "policy_statement": "The system may auto-flag records internally for prioritized human review. Supplier contact and metadata mutation remain disabled."
+}
