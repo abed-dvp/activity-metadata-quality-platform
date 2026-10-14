@@ -1,0 +1,23 @@
+{
+  "review_queue_human_review_rows": 15,
+  "feedback_rows": 2,
+  "feedback_coverage_of_human_review_queue": 0.13333333333333333,
+  "feedback_source_counts": {
+    "assisted_evidence_review": 2
+  },
+  "human_gold_rows": 0,
+  "assisted_feedback_rows": 2,
+  "confirmed_issue_rows": 2,
+  "confirmed_address_defects": 2,
+  "confirmed_coordinate_changes_required": 0,
+  "policy_review_alignment_rows": 2,
+  "false_pass_rows": 0,
+  "false_coordinate_candidate_rows": 0,
+  "regression_cases_emitted": 2,
+  "threshold_calibration_eligible_rows": 0,
+  "metadata_mutations_applied": 0,
+  "supplier_contacts_applied": 0,
+  "retraining_triggered": false,
+  "production_policy_change_triggered": false,
+  "governance_note": "Assisted evidence review may create regression safety cases but cannot calibrate thresholds or act as independent human gold."
+}
