@@ -1,1 +1,1 @@
-location-quality-gate-v2\n
+location-quality-gate-v3
