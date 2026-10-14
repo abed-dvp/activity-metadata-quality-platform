@@ -1,0 +1,24 @@
+version: feedback_governance_v1
+status: pre_production
+
+feedback_tiers:
+  assisted_evidence_review:
+    can_create_regression_safety_case: true
+    can_calibrate_thresholds: false
+    can_trigger_retraining: false
+    counts_as_human_gold: false
+
+  independent_human_gold:
+    can_create_regression_safety_case: true
+    can_calibrate_thresholds: true
+    can_trigger_retraining_candidate: true
+    counts_as_human_gold: true
+
+guards:
+  - Feedback IDs must be unique.
+  - Non-human-gold feedback cannot calibrate thresholds.
+  - Feedback never mutates supplier metadata directly.
+  - Regression cases preserve the original evidence and expected safe route.
+  - Retraining requires an explicit later decision; ingestion of feedback alone never retrains a model.
+
+production_enabled: false
