@@ -33,7 +33,7 @@ def address_specificity(address: object) -> str:
 def _tokens(value: object, stopwords: Iterable[str] = NAME_STOPWORDS) -> set[str]:
     text = str(value or "").lower()
     tokens = set(re.findall(r"[a-z0-9]+", text))
-    return {t for t in tokens if len(t) > 1 and t not in set(stopwords)}
+    return {\n        t for t in tokens\n        if len(t) > 1 and not t.isdigit() and t not in set(stopwords)\n    }
 
 
 def entity_name_match_score(name: object, reference_display_name: object) -> float:
