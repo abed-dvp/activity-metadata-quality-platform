@@ -1,0 +1,16 @@
+{
+  "rows": 30,
+  "pass_rows": 18,
+  "review_rows": 12,
+  "route_counts": {
+    "ADDRESS_OR_GEOCODER_REVIEW": 2,
+    "ADDRESS_QUALITY_REVIEW": 5,
+    "BOUNDARY_REVIEW": 2,
+    "GEOCODER_UNRESOLVED_REVIEW": 3,
+    "PASS": 18
+  },
+  "coordinate_mismatch_candidates": 0,
+  "address_or_geocoder_review": 2,
+  "automatic_coordinate_overwrite_enabled": false,
+  "policy": "Large geocoder distance is insufficient to label a bad pin. Address specificity and entity-match evidence must pass first."
+}
