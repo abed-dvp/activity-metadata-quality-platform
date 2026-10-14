@@ -1,0 +1,36 @@
+name: Unified quality impact score
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/quality-impact-trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -e ".[dev]"
+      - run: pytest -q
+      - name: Build unified score
+        run: python -m src.evaluation.run_quality_impact_score
+      - name: Commit score reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/impact/quality_impact_scores.csv reports/impact/quality_impact_summary.json
+          if ! git diff --cached --quiet; then
+            git commit -m "eval: add unified quality impact score"
+            git fetch origin main
+            git rebase origin/main
+            git push
+          fi
