@@ -6,56 +6,22 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.quality.address_gate import route_location_quality
+
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_INPUT = ROOT / "reports" / "location" / "semantic" / "location_semantic_results.csv"
 DEFAULT_QUEUE = ROOT / "reports" / "location" / "semantic" / "location_review_queue.csv"
 DEFAULT_SUMMARY = ROOT / "reports" / "location" / "semantic" / "location_review_summary.json"
 
 
-def address_specificity(address: object) -> str:
-    text = str(address or "").strip().lower()
-    if not text or text in {"nan", "<na>"}:
-        return "missing"
-    if text in {"united kingdom", "uk"}:
-        return "country_only"
-    if text in {"london, united kingdom", "london"}:
-        return "city_only"
-
-    has_digit = any(ch.isdigit() for ch in text)
-    comma_parts = [p.strip() for p in text.split(",") if p.strip()]
-    if has_digit:
-        return "street_number"
-    if len(comma_parts) >= 2:
-        return "street_or_locality"
-    return "low_specificity"
-
-
-def likely_root_cause(row: pd.Series) -> str:
-    decision = str(row.get("consistency_decision", ""))
-    specificity = address_specificity(row.get("address"))
-
-    if decision == "unresolved":
-        return "geocoder_unresolved"
-    if specificity in {"missing", "country_only", "city_only", "low_specificity"}:
-        return "underspecified_address"
-    if decision == "suspicious":
-        return "address_coordinate_mismatch_candidate"
-    if decision == "uncertain":
-        return "boundary_or_geocoder_ambiguity"
-    return "no_review"
-
-
-def priority(row: pd.Series) -> int:
-    cause = likely_root_cause(row)
-    if cause == "address_coordinate_mismatch_candidate":
-        return 1
-    if cause == "geocoder_unresolved":
-        return 2
-    if cause == "underspecified_address":
-        return 3
-    if cause == "boundary_or_geocoder_ambiguity":
-        return 4
-    return 99
+ROOT_CAUSE_BY_ROUTE = {
+    "ADDRESS_OR_GEOCODER_REVIEW": "address_or_geocoder_mismatch",
+    "ADDRESS_QUALITY_REVIEW": "underspecified_address",
+    "GEOCODER_UNRESOLVED_REVIEW": "geocoder_unresolved",
+    "BOUNDARY_REVIEW": "boundary_or_geocoder_ambiguity",
+    "COORDINATE_MISMATCH_CANDIDATE": "coordinate_mismatch_candidate",
+    "HUMAN_REVIEW": "unknown",
+}
 
 
 def build_review_queue(results: pd.DataFrame) -> pd.DataFrame:
@@ -63,9 +29,9 @@ def build_review_queue(results: pd.DataFrame) -> pd.DataFrame:
         results["consistency_decision"].isin(["suspicious", "uncertain", "unresolved"])
     ].copy()
 
-    queue["address_specificity"] = queue["address"].map(address_specificity)
-    queue["likely_root_cause"] = queue.apply(likely_root_cause, axis=1)
-    queue["review_priority"] = queue.apply(priority, axis=1)
+    gate = queue.apply(lambda row: pd.Series(route_location_quality(row)), axis=1)
+    queue = pd.concat([queue.reset_index(drop=True), gate.reset_index(drop=True)], axis=1)
+    queue["likely_root_cause"] = queue["quality_gate_route"].map(ROOT_CAUSE_BY_ROUTE).fillna("unknown")
 
     keep = [
         "review_priority",
@@ -81,7 +47,11 @@ def build_review_queue(results: pd.DataFrame) -> pd.DataFrame:
         "distance_m",
         "consistency_decision",
         "address_specificity",
+        "entity_name_match_score",
+        "quality_gate_route",
+        "likely_bad_field",
         "likely_root_cause",
+        "automatic_coordinate_overwrite",
     ]
     return queue[keep].sort_values(
         ["review_priority", "distance_m"],
@@ -97,15 +67,24 @@ def summarize(queue: pd.DataFrame) -> dict:
             str(k): int(v)
             for k, v in queue["consistency_decision"].value_counts().sort_index().to_dict().items()
         },
+        "by_gate_route": {
+            str(k): int(v)
+            for k, v in queue["quality_gate_route"].value_counts().sort_index().to_dict().items()
+        },
         "by_root_cause": {
             str(k): int(v)
             for k, v in queue["likely_root_cause"].value_counts().sort_index().to_dict().items()
         },
-        "priority_1_mismatch_candidates": int((queue["review_priority"] == 1).sum()),
+        "coordinate_mismatch_candidates": int(
+            (queue["quality_gate_route"] == "COORDINATE_MISMATCH_CANDIDATE").sum()
+        ),
+        "address_or_geocoder_review": int(
+            (queue["quality_gate_route"] == "ADDRESS_OR_GEOCODER_REVIEW").sum()
+        ),
         "automatic_correction_enabled": False,
         "decision": (
-            "Location anomalies are routed to human review with address specificity separated "
-            "from coordinate-mismatch evidence. No coordinate is automatically overwritten."
+            "Review routing now uses the address/entity quality gate. Large distance alone "
+            "cannot create a bad-pin candidate, and no coordinate is automatically overwritten."
         ),
     }
 
@@ -124,7 +103,7 @@ def main(input_path: Path, queue_path: Path, summary_path: Path) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Build prioritized location review queue.")
+    parser = argparse.ArgumentParser(description="Build gated prioritized location review queue.")
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
     parser.add_argument("--queue", type=Path, default=DEFAULT_QUEUE)
     parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY)
