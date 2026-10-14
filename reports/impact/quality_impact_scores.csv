@@ -1,0 +1,31 @@
+entity_id,name,quality_impact_score,priority_band,score_status,domain_coverage,location_impact_score,location_route,likely_bad_field,category_impact_score,category_evaluated,categories_evaluated,category_evaluation_count,category_issue_count,automatic_action_enabled
+london_poi_58757.0,Waring Park,45,MEDIUM,full,1.0,25,ADDRESS_QUALITY_REVIEW,address,20,True,nature,1,1,False
+london_poi_45825.0,Barn Elms Playing Fields,35,MEDIUM,full,1.0,25,ADDRESS_QUALITY_REVIEW,address,10,True,nature,1,1,False
+london_poi_49699.0,Kneller Gardens,35,MEDIUM,full,1.0,25,ADDRESS_QUALITY_REVIEW,address,10,True,nature,1,1,False
+london_poi_46684.0,Italian Gardens,30,MEDIUM,full,1.0,25,ADDRESS_QUALITY_REVIEW,address,5,True,nature,1,1,False
+london_poi_247671.0,Naval & Military Club,25,MEDIUM,full,1.0,20,GEOCODER_UNRESOLVED_REVIEW,reference_resolution,5,True,"museum,nature",2,1,False
+london_poi_247775.0,Floatworks LTD,20,LOW,full,1.0,20,GEOCODER_UNRESOLVED_REVIEW,reference_resolution,0,True,"museum,nature",2,0,False
+london_poi_39293.0,3 Mills Studios,10,LOW,full,1.0,0,PASS,none,10,True,museum,1,1,False
+london_poi_51228.0,The Ship Inn,5,LOW,full,1.0,0,PASS,none,5,True,nature,1,1,False
+london_poi_64989.0,The Hope and Anchor,5,LOW,full,1.0,0,PASS,none,5,True,"museum,nature",2,1,False
+london_poi_217068.0,The Venue,0,NONE,full,1.0,0,PASS,none,0,True,nature,1,0,False
+london_poi_245423.0,Air Powerplate and fitness studio,0,NONE,full,1.0,0,PASS,none,0,True,nature,1,0,False
+london_poi_246375.0,18 Stafford Terrace,0,NONE,full,1.0,0,PASS,none,0,True,nature,1,0,False
+london_poi_247014.0,Embody Fitness,0,NONE,full,1.0,0,PASS,none,0,True,nature,1,0,False
+london_poi_42079.0,Acorn 20/20,35,MEDIUM,partial,0.5,35,ADDRESS_OR_GEOCODER_REVIEW,address_or_reference_match,0,False,,0,0,False
+london_poi_63724.0,The Corrib Rest,35,MEDIUM,partial,0.5,35,ADDRESS_OR_GEOCODER_REVIEW,address_or_reference_match,0,False,,0,0,False
+london_poi_79543.0,Chemsford Square Open Space Tennis Courts,25,MEDIUM,partial,0.5,25,ADDRESS_QUALITY_REVIEW,address,0,False,,0,0,False
+london_poi_247396.0,Carlton Club,20,LOW,partial,0.5,20,GEOCODER_UNRESOLVED_REVIEW,reference_resolution,0,False,,0,0,False
+london_poi_249037.0,Fulham Fitness Studio | empowered by PTbyPT,15,LOW,partial,0.5,15,BOUNDARY_REVIEW,address_or_coordinate,0,False,,0,0,False
+london_poi_74784.0,Royal Air Force Museum,15,LOW,partial,0.5,15,BOUNDARY_REVIEW,address_or_coordinate,0,False,,0,0,False
+london_poi_245579.0,Usurp Art Gallery & Studios,0,NONE,partial,0.5,0,PASS,none,0,False,,0,0,False
+london_poi_245787.0,Fryent Country Park,0,NONE,partial,0.5,0,PASS,none,0,False,,0,0,False
+london_poi_245981.0,Underworld Night Club,0,NONE,partial,0.5,0,PASS,none,0,False,,0,0,False
+london_poi_246949.0,Fitness First Old Street,0,NONE,partial,0.5,0,PASS,none,0,False,,0,0,False
+london_poi_247424.0,Eqvvs Training,0,NONE,partial,0.5,0,PASS,none,0,False,,0,0,False
+london_poi_247958.0,Tranquilstate,0,NONE,partial,0.5,0,PASS,none,0,False,,0,0,False
+london_poi_248442.0,The Klinik,0,NONE,partial,0.5,0,PASS,none,0,False,,0,0,False
+london_poi_35541.0,London Transport Museum,0,NONE,partial,0.5,0,PASS,none,0,False,,0,0,False
+london_poi_35760.0,The Sherlock Holmes Museum,0,NONE,partial,0.5,0,PASS,none,0,False,,0,0,False
+london_poi_35770.0,Garden Museum,0,NONE,partial,0.5,0,PASS,none,0,False,,0,0,False
+london_poi_53716.0,Proud2,0,NONE,partial,0.5,0,PASS,none,0,False,,0,0,False

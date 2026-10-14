@@ -1,0 +1,19 @@
+{
+  "rows": 30,
+  "full_score_rows": 13,
+  "partial_score_rows": 17,
+  "full_score_priority_bands": {
+    "LOW": 4,
+    "MEDIUM": 5,
+    "NONE": 4
+  },
+  "partial_score_priority_bands": {
+    "LOW": 3,
+    "MEDIUM": 3,
+    "NONE": 11
+  },
+  "max_full_quality_impact_score": 45,
+  "automatic_action_enabled": false,
+  "score_semantics": "0-100 observed review-priority impact; higher means more urgent quality review.",
+  "important_caveat": "Weights are heuristic prioritization weights, not calibrated revenue, conversion, or causal business-impact estimates. Partial scores must not be ranked directly against full scores."
+}
