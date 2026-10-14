@@ -1,0 +1,3 @@
+feedback_id,entity_id,domain,feedback_source,reviewer_type,confirmed_issue,confirmed_bad_field,confirmed_root_cause,coordinate_change_required,address_change_required,remediation_candidate,human_gold_eligible,threshold_calibration_eligible,regression_safety_eligible
+location_42079_assisted_v1,london_poi_42079.0,location,assisted_evidence_review,assisted,True,address,ADDRESS_CONTEXT_INCOMPLETE,False,True,"20 Richmond Road, Kingston upon Thames, KT2 5BE",False,False,True
+location_63724_assisted_v1,london_poi_63724.0,location,assisted_evidence_review,assisted,True,address,ADDRESS_STREET_NAME_TYPO,False,True,"76-78 Salusbury Road, Queen's Park, London, NW6 6PA",False,False,True
