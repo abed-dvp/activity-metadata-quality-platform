@@ -1,0 +1,36 @@
+name: End-to-end executive demo
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/end-to-end-demo-trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -e ".[dev]"
+      - run: pytest -q
+      - name: Run zero-cost end-to-end demo
+        run: python -m src.demo.run_demo
+      - name: Commit demo outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/demo/end_to_end_demo.json reports/demo/end_to_end_demo.md
+          if ! git diff --cached --quiet; then
+            git commit -m "demo: generate end-to-end executive walkthrough"
+            git fetch origin main
+            git rebase origin/main
+            git push
+          fi
