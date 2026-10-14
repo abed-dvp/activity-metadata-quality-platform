@@ -1,0 +1,17 @@
+entity_id,name,evaluated_category,is_member,semantic_decision,semantic_confidence,provider_error,in_representative_sample,in_positive_diagnostic,holdout_source
+london_poi_217068.0,The Venue,nature,0,not_member,0.99,,True,False,residual_excluding_phase3_calibration
+london_poi_245423.0,Air Powerplate and fitness studio,nature,0,not_member,0.99,,True,False,residual_excluding_phase3_calibration
+london_poi_246375.0,18 Stafford Terrace,nature,0,not_member,0.99,,True,False,residual_excluding_phase3_calibration
+london_poi_247014.0,Embody Fitness,nature,0,not_member,0.99,,True,False,residual_excluding_phase3_calibration
+london_poi_247671.0,Naval & Military Club,museum,0,not_member,0.95,,True,False,residual_excluding_phase3_calibration
+london_poi_247671.0,Naval & Military Club,nature,0,not_member,0.99,,True,False,residual_excluding_phase3_calibration
+london_poi_247775.0,Floatworks LTD,museum,0,not_member,0.99,,True,False,residual_excluding_phase3_calibration
+london_poi_247775.0,Floatworks LTD,nature,0,not_member,0.99,,True,False,residual_excluding_phase3_calibration
+london_poi_39293.0,3 Mills Studios,museum,0,not_member,0.85,,True,False,residual_excluding_phase3_calibration
+london_poi_45825.0,Barn Elms Playing Fields,nature,1,member,0.85,,False,True,residual_excluding_phase3_calibration
+london_poi_46684.0,Italian Gardens,nature,1,member,0.95,,True,True,residual_excluding_phase3_calibration
+london_poi_49699.0,Kneller Gardens,nature,1,member,0.85,,False,True,residual_excluding_phase3_calibration
+london_poi_51228.0,The Ship Inn,nature,0,not_member,0.95,,True,False,residual_excluding_phase3_calibration
+london_poi_58757.0,Waring Park,nature,1,uncertain,0.5,,False,True,residual_excluding_phase3_calibration
+london_poi_64989.0,The Hope and Anchor,museum,0,not_member,0.95,,True,False,residual_excluding_phase3_calibration
+london_poi_64989.0,The Hope and Anchor,nature,0,not_member,0.99,,True,False,residual_excluding_phase3_calibration
