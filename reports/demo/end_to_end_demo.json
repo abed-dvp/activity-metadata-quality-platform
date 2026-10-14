@@ -1,0 +1,66 @@
+{
+  "demo_version": "end_to_end_v1",
+  "entity_id": "london_poi_42079.0",
+  "listing": {
+    "name": "Acorn 20/20",
+    "address": "20 Richmond Rd",
+    "latitude": 51.41304021,
+    "longitude": -0.300514441
+  },
+  "stage_1_detect": {
+    "signal": "address_coordinate_disagreement",
+    "geocoder_status": "resolved",
+    "distance_m": 26915.4,
+    "raw_consistency_decision": "suspicious"
+  },
+  "stage_2_quality_gate": {
+    "route": "ADDRESS_OR_GEOCODER_REVIEW",
+    "likely_bad_field": "address_or_reference_match",
+    "address_specificity": "street_number",
+    "entity_name_match_score": 0.0,
+    "automatic_coordinate_overwrite": false
+  },
+  "stage_3_quality_impact": {
+    "score": 35,
+    "priority_band": "MEDIUM",
+    "score_status": "partial",
+    "domain_coverage": 0.5,
+    "location_impact_score": 35,
+    "category_evaluated": false,
+    "category_impact_score": 0
+  },
+  "stage_4_action_policy": {
+    "action": "HUMAN_REVIEW",
+    "lane": "EVIDENCE_GAP",
+    "owner": "CONTENT_QUALITY_OPS",
+    "auto_flag_internal": true,
+    "downstream_if_confirmed": "FIELD_SPECIFIC_REMEDIATION",
+    "supplier_contact_enabled": false,
+    "metadata_mutation_enabled": false
+  },
+  "stage_5_feedback": {
+    "feedback_source": "assisted_evidence_review",
+    "reviewer_type": "assisted",
+    "confirmed_issue": true,
+    "confirmed_bad_field": "address",
+    "confirmed_root_cause": "ADDRESS_CONTEXT_INCOMPLETE",
+    "remediation_candidate": "20 Richmond Road, Kingston upon Thames, KT2 5BE",
+    "learning_signal": "ADDRESS_FIRST_ROUTING_CONFIRMED",
+    "human_gold_eligible": false,
+    "may_update_thresholds": false,
+    "metadata_mutation_applied": false
+  },
+  "stage_6_regression": {
+    "expected_route": "ADDRESS_OR_GEOCODER_REVIEW",
+    "forbidden_route": "COORDINATE_MISMATCH_CANDIDATE",
+    "calibration_use_allowed": false
+  },
+  "executive_takeaway": {
+    "detected_large_disagreement": true,
+    "avoided_automatic_bad_pin_claim": true,
+    "human_review_confirmed_address_issue": true,
+    "learning_loop_closed": true,
+    "external_side_effects": false,
+    "message": "The platform detected a large location inconsistency, used quality gates to avoid a false bad-pin conclusion, routed the case to review, captured the confirmed address defect, and converted the outcome into a regression safety case without changing supplier metadata automatically."
+  }
+}
