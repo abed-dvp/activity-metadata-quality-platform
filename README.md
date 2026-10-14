@@ -4,6 +4,40 @@ An eval-driven catalog-quality system for travel marketplace metadata.
 
 The repository implements a real-data pipeline, deterministic quality checks, an atomic Gemini semantic evaluator, and a human adjudication loop for building stronger gold/regression datasets.
 
+
+## 60-second end-to-end demo
+
+For the shortest interview walkthrough, run:
+
+```bash
+python -m src.demo.run_demo
+```
+
+No API key or paid model call is required. The demo uses cached real evaluation artifacts and follows **Acorn 20/20** through the complete system:
+
+```text
+26.9 km address ↔ coordinate disagreement
+        ↓
+ADDRESS_OR_GEOCODER_REVIEW
+        ↓
+Quality Impact Score = 35 / 100
+        ↓
+HUMAN_REVIEW
+        ↓
+assisted evidence review confirms address-side defect
+        ↓
+coordinate is not overwritten
+        ↓
+regression safety case created
+```
+
+The key product behavior is that anomaly detection does not directly trigger a catalog mutation. Coverage, field-level diagnosis, action policy, and review feedback are explicit gates.
+
+- Walkthrough: [docs/end-to-end-demo.md](docs/end-to-end-demo.md)
+- Generated executive snapshot: [reports/demo/end_to_end_demo.md](reports/demo/end_to_end_demo.md)
+- Machine-readable trace: [reports/demo/end_to_end_demo.json](reports/demo/end_to_end_demo.json)
+
+
 ## Data source
 
 The first source is the **Enriched Tourism Dataset London (POIs)** with human category annotations.
