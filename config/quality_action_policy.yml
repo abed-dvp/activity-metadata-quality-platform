@@ -1,0 +1,29 @@
+version: quality_action_policy_v1
+status: pre_production_candidate
+production_enabled: false
+
+principles:
+  - Partial domain coverage can never produce PASS.
+  - Internal auto-flagging may prioritize human review.
+  - No supplier communication is sent automatically.
+  - No supplier metadata is changed automatically.
+  - Remediation type is selected only after field-specific evidence review.
+
+actions:
+  PASS:
+    external_side_effect: false
+
+  NEED_MORE_EVIDENCE:
+    external_side_effect: false
+
+  HUMAN_REVIEW:
+    external_side_effect: false
+
+downstream_candidates_after_human_confirmation:
+  - SUPPLIER_FIX_REQUEST_CANDIDATE
+  - INTERNAL_COORDINATE_FIX_CANDIDATE
+  - CATEGORY_FIX_CANDIDATE
+  - FIELD_SPECIFIC_REMEDIATION
+
+supplier_contact_enabled: false
+metadata_mutation_enabled: false
